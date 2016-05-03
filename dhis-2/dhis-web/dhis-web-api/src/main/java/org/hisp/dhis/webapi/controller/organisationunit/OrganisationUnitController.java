@@ -307,7 +307,12 @@ public class OrganisationUnitController
             generator.writeStringField( "code", organisationUnit.getCode() );
             generator.writeStringField( "name", organisationUnit.getName() );
             generator.writeStringField( "level", String.valueOf( organisationUnit.getLevel() ) );
-            generator.writeStringField( "parent", organisationUnit.getParent().getUid() );
+
+            if ( organisationUnit.getParent() != null )
+            {
+                generator.writeStringField( "parent", organisationUnit.getParent().getUid() );
+            }
+
             generator.writeStringField( "parentGraph", organisationUnit.getParentGraph( roots ) );
         }
 

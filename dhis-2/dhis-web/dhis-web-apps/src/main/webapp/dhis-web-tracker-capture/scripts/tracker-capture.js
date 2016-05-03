@@ -14,6 +14,7 @@ var optionSetIds = [];
 var trackedEntityAttributeIds = [];
 var dataElementIds = [];
 var batchSize = 50;
+var programBatchSize = 25;
 
 dhis2.tc.store = null;
 dhis2.tc.metaDataCached = dhis2.tc.metaDataCached || false;
@@ -271,7 +272,7 @@ function getPrograms( programs, ids )
         return;
     }
     
-    var batches = dhis2.tracker.chunk( ids, batchSize );
+    var batches = dhis2.tracker.chunk( ids, programBatchSize );
     
     var mainDef = $.Deferred();
     var mainPromise = mainDef.promise();

@@ -238,7 +238,7 @@ var eventCaptureServices = angular.module('eventCaptureServices', ['ngResource']
             
             if(paging){
                 var pgSize = pager ? pager.pageSize : 50;
-                var pg = pager ? pager.page : 1;
+                var pg = pager.page ? pager.page : 1;
                 pgSize = pgSize > 1 ? pgSize  : 1;
                 pg = pg > 1 ? pg : 1; 
                 url = url  + '&pageSize=' + pgSize + '&page=' + pg + '&totalPages=true';

@@ -28,6 +28,7 @@ package org.hisp.dhis.trackedentity;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import org.apache.commons.lang3.StringUtils;
 import org.hisp.dhis.common.Grid;
 import org.hisp.dhis.common.OrganisationUnitSelectionMode;
 import org.hisp.dhis.common.QueryItem;
@@ -47,8 +48,6 @@ import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Abyot Asalefew
@@ -305,9 +304,17 @@ public class DefaultTrackedEntityAttributeService
                 return "Value '" + errorValue + "' is not a valid username for attribute " + trackedEntityAttribute.getUid();
             }
         }
+        else if ( ValueType.DATE == valueType && !DateUtils.dateIsValid( value ) )
+        {
+            return "Value '" + errorValue + "' is not a valid date for attribute " + trackedEntityAttribute.getUid();
+        }
+        else if ( ValueType.DATETIME == valueType && !DateUtils.dateTimeIsValid( value ) )
+        {
+            return "Value '" + errorValue + "' is not a valid datetime for attribute " + trackedEntityAttribute.getUid();
+        }
         else if ( trackedEntityAttribute.hasOptionSet() && !trackedEntityAttribute.isValidOptionValue( value ) )
         {
-            return "Value '" + errorValue + "' is not a valid option for attribute " + 
+            return "Value '" + errorValue + "' is not a valid option for attribute " +
                 trackedEntityAttribute.getUid() + " and option set " + trackedEntityAttribute.getOptionSet().getUid();
         }
 

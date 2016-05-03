@@ -375,7 +375,7 @@ public class JdbcAnalyticsTableManager
 
         if ( isApprovalEnabled() )
         {
-            String col = "coalesce(des.datasetapprovallevel, aon.approvallevel, da.minlevel, " + APPROVAL_LEVEL_UNAPPROVED + ")";
+            String col = "coalesce(des.datasetapprovallevel, aon.approvallevel, da.minlevel, " + APPROVAL_LEVEL_UNAPPROVED + ") as approvallevel ";
 
             String[] al = { quote( "approvallevel" ), "integer", col };
             columns.add( al );

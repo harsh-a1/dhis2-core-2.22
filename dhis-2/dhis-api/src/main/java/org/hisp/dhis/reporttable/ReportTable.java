@@ -594,7 +594,7 @@ public class ReportTable
 
             for ( DimensionalItemObject object : row )
             {
-                grid.addValue( object.getUid() );
+                grid.addValue( object.getDimensionItem() );
                 grid.addValue( object.getDisplayProperty( displayProperty ) );
                 grid.addValue( object.getCode() );
                 grid.addValue( object.getDisplayDescription() );

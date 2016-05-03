@@ -491,9 +491,7 @@ public class Attribute
     {
         this.sortOrder = sortOrder;
     }
-
-
-
+    
     public List<Class<? extends IdentifiableObject>> getSupportedClasses()
     {
         List<Class<? extends IdentifiableObject>> klasses = new ArrayList<>();
@@ -550,6 +548,7 @@ public class Attribute
             optionAttribute = attribute.isOptionAttribute();
             optionSetAttribute = attribute.isOptionSetAttribute();
             mandatory = attribute.isMandatory();
+            unique = attribute.isUnique();
 
             if ( strategy.isReplace() )
             {
