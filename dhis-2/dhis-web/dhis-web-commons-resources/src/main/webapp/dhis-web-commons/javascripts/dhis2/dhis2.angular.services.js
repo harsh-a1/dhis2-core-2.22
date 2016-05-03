@@ -1272,8 +1272,10 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                     {name:"d2:round",parameters:1},
                     {name:"d2:hasValue",parameters:1},
                     {name:"d2:lastEventDate",parameters:1},
+                    {name:"d2:validatePattern",parameters:2},
                     {name:"d2:addControlDigits",parameters:1},
-                    {name:"d2:checkControlDigits",parameters:1}];
+                    {name:"d2:checkControlDigits",parameters:1},
+                    {name:"d2:length",parameters:1}];
                 var continueLooping = true;
                 //Safety harness on 10 loops, in case of unanticipated syntax causing unintencontinued looping
                 for(var i = 0; i < 10 && continueLooping; i++ ) {
@@ -1545,6 +1547,21 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 expression = expression.replace(callToThisFunction, valueFound);
                                 successfulExecution = true;
                             }
+                            else if(dhisFunction.name === "d2:validatePattern") {
+                                var inputToValidate = parameters[0].toString();
+                                var pattern = parameters[1];
+                                var regEx = new RegExp(pattern,'g');
+                                var match = inputToValidate.match(regEx);
+                                
+                                var matchFound = false;
+                                if(match !== null && inputToValidate === match[0]) {
+                                    matchFound = true;
+                                }
+
+                                //Replace the end evaluation of the dhis function:
+                                expression = expression.replace(callToThisFunction, matchFound);
+                                successfulExecution = true;
+                            }
                             else if(dhisFunction.name === "d2:addControlDigits") {
 
                                 var baseNumber = parameters[0];
@@ -1609,6 +1626,10 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                                 expression = expression.replace(callToThisFunction, parameters[0]);
                                 successfulExecution = false;
                             }
+                            else if(dhisFunction.name === "d2:length") {
+                                expression = expression.replace(callToThisFunction, String(parameters[0]).length);
+                                successfulExecution = true;
+                            }
                         });
                     });
 
@@ -1652,9 +1673,6 @@ var d2Services = angular.module('d2Services', ['ngResource'])
                 //Just run the expression. This is much faster than the debug route: http://jsperf.com/try-catch-block-loop-performance-comparison
                 var dhisfunctionsevaluated = runDhisFunctions(expression, variablesHash, flag);
                 answer = eval(dhisfunctionsevaluated);
-            }
-            if(dhis2.validation.isNumber(answer)){
-                answer = Math.round(answer*100)/100;
             }
             return answer;
         };

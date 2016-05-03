@@ -179,7 +179,7 @@ trackerCapture.controller('DataEntryController',
                             }
                             else {
                                 //TODO: Alerts is going to be replaced with a proper display mecanism.
-                                alert($scope.prStDes[effect.dataElement.id].dataElement.formName + "Was blanked out and hidden by your last action");
+                                alert($scope.prStDes[effect.dataElement.id].dataElement.displayFormName + " was blanked out and hidden by your last action");
                             }
 
                             //Blank out the value:
@@ -239,6 +239,10 @@ trackerCapture.controller('DataEntryController',
                     if(effect.ineffect && effect.dataElement) {
                         //For "ASSIGN" actions where we have a dataelement, we save the calculated value to the dataelement:
                         //Blank out the value:
+                        
+                        processedValue = processedValue === "true" ? true : processedValue;
+                        processedValue = processedValue === "false" ? false : processedValue;
+                        
                         var processedValue = $filter('trimquotes')(effect.data);
                         affectedEvent[effect.dataElement.id] = processedValue;
                         $scope.assignedFields[event][effect.dataElement.id] = true;

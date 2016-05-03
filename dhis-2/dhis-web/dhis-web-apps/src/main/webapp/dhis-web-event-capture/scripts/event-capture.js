@@ -23,6 +23,7 @@ var optionSetIds = [];
 var dataElementIds = [];
 
 var batchSize = 50;
+var programBatchSize = 25;
 
 dhis2.ec.isOffline = false;
 dhis2.ec.store = null;
@@ -270,7 +271,7 @@ function getPrograms( programs, ids )
         return;
     }
     
-    var batches = dhis2.tracker.chunk( ids, batchSize );
+    var batches = dhis2.tracker.chunk( ids, programBatchSize );
     
     var mainDef = $.Deferred();
     var mainPromise = mainDef.promise();

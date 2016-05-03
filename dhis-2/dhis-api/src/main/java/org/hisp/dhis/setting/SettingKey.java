@@ -61,7 +61,7 @@ public enum SettingKey
     EMAIL_PASSWORD( "keyEmailPassword", "", String.class, true ),
     INSTANCE_BASE_URL( "keyInstanceBaseUrl" ),
     SCHEDULED_TASKS( "keySchedTasks", ListMap.class ),
-    SMS_CONFIG( "keySmsConfig", SmsConfiguration.class ),
+    SMS_CONFIG( "keySmsConfiguration", SmsConfiguration.class ),
     CACHE_STRATEGY( "keyCacheStrategy", "CACHE_6AM_TOMORROW", String.class ),
     TIME_FOR_SENDING_MESSAGE( "timeSendingMessage", "08:00", String.class ),
     SEND_MESSAGE_SCHEDULED_TASKS( "sendMessageScheduled" ),

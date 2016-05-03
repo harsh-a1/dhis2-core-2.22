@@ -8247,9 +8247,9 @@ Ext.onReady( function() {
 
                                         // dimensions
                                         requests.push({
-                                            url: contextPath + '/api/dimensions.json?fields=id,' + namePropertyUrl + '&paging=false',
+                                            url: contextPath + '/api/dimensions.json?fields=id,' + namePropertyUrl + '&filter=dimensionType:eq:ORGANISATIONUNIT_GROUPSET&paging=false',
                                             success: function(r) {
-                                                init.dimensions = Ext.decode(r.responseText).organisationUnitGroupSets || [];
+                                                init.dimensions = Ext.decode(r.responseText).dimensions || [];
                                                 fn();
                                             }
                                         });
