@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<de-codes>
+
+<meta>
+<trackedEntity>cSY0czqkWx8</trackedEntity><!-- trackedEntity UID for Health Service Provider -->
+</meta>
+
+<registration>
+	<orgunit col="0"></orgunit>
+	<attribute col="1">MCJaNkHvR4k</attribute><!-- First name -->
+	<attribute col="2">Vd1MzisYkNP</attribute><!-- Middle name -->
+	<attribute col="3">PVGdYaZ1CAC</attribute><!-- Last Name -->
+	<attribute col="4">rIBQlnGYHKi</attribute><!-- Date of birth (YYYY-MM-DD) -->
+	<attribute col="5">md4PduGoYTA</attribute><!-- Age -->
+	<attribute col="6">ZBdTzQfOkOK</attribute><!-- Gender -->
+	<attribute col="7">MFsKkZohkvG</attribute><!-- Educational details -->
+	<attribute col="8">XJTPXq0oHlb</attribute><!-- Address line 1 -->
+	<attribute col="9">lnBysYe3nv5</attribute><!-- Address line 2 -->
+	<attribute col="10">SxSh9297ihW</attribute><!-- Mobile number -->
+	<attribute col="11">XnygNsMcC4Y</attribute><!-- E-mail address -->
+	<attribute col="12">VDTaGwJqZHl</attribute><!-- NIC# -->
+	<attribute col="13">uDld3sgKVVe</attribute><!-- Registration date -->
+	<attribute col="14">MTJ9dpshKJz</attribute><!-- Code -->
+	<attribute col="15">ndf6du48Fy5</attribute><!-- OldproviderCode -->
+	<attribute col="16">ka9jVUgAhdU</attribute><!-- Department -->
+	<attribute col="17">nmgUmZX5GBr</attribute><!-- Donor -->
+	<attribute col="18">JbVC3hpPCMW</attribute><!-- Qualification -->
+</registration>
+
+<enrollment>
+	<date col="13"></date> <!-- Registration date -->
+	<program>pNr1FbGjvnP</program><!-- program UID for Program PK RH FP-Health Service Provider Registry -->
+</enrollment>
+
+<event>
+	<program>pNr1FbGjvnP</program><!-- program UID for Program PK RH FP-IPC Workers Registry -->
+	<programStage>Nhy84s1mTnW</programStage><!-- program Stage UID -->
+	<status>COMPLETED</status>
+	<dataValues>
+		<de-code col="19">LpvAUrGijQf</de-code><!-- Affiliation Status -->
+		<de-code col="20">duXQ0gicgab</de-code><!-- GS type -->
+		<de-code col="21">Xw6ioypf3pc</de-code><!-- Provider Category -->
+	</dataValues>
+</event>
+
+</de-codes>

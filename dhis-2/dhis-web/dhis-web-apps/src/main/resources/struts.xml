@@ -10,6 +10,22 @@
 		<action name="index" class="org.hisp.dhis.commons.action.NoAction">
 			<result name="success" type="redirect">index.html</result>
 		</action>
+		<!-- Excel-Import-App -->
+		<action name="importData" class="org.hisp.dhis.dataimport.action.TrackerDataImportAction">
+			<param name="page">/dhis-web-apps/trackerImport.vm</param>
+	   		<result name="success" type="velocity">/content.vm</result> 
+		</action>
+		
+		<action name="importProgramStageData" class="org.hisp.dhis.dataimport.action.ProgramStageDataImportAction">
+			<param name="page">/dhis-web-apps/programStageImport.vm</param>
+	   		<result name="success" type="velocity">/content.vm</result> 
+		</action>		
+			 	
+		<action name="aggregateDataImport" class="org.hisp.dhis.dataimport.action.AggregateDataImportAction">
+			 <param name="page">/dhis-web-apps/aggregateImport.vm</param>
+	    	 <result name="success" type="velocity">/content.vm</result> 
+		</action>		
+		<!-- Excel-Import-App End -->
     </package>
     
 	<package name="dhis-web-pivot" extends="dhis-web-commons" namespace="/dhis-web-pivot">
@@ -87,5 +103,12 @@
 			<result name="success" type="redirect">#</result>
 		</action>
 	</package>
-    
+
+   <!-- dhis-web-Excel-Import-app -->    
+	<package name="dhis-web-excel-import" extends="dhis-web-commons" namespace="/dhis-web-excel-import">
+		<action name="index" class="org.hisp.dhis.commons.action.NoAction">
+			<result name="success" type="redirect">index.html</result>
+		</action>
+    </package>
+
 </struts>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<de-codes>
+
+<meta>
+<trackedEntity>cSY0czqkWx8</trackedEntity><!-- trackedEntity UID for Health Service Provider -->
+</meta>
+
+<registration>
+	<attribute col="0">wbeG4oQvdpR</attribute><!-- MWRA ID -->
+</registration>
+
+<programStage>
+	<program>pNr1FbGjvnP</program><!-- program UID for Program PK RH FP-IPC Workers Registry -->
+	<programStage>Nhy84s1mTnW</programStage><!-- program Stage UID -->
+	<status>COMPLETED</status>
+</programStage>
+
+<event1>
+	<date col="1"></date><!-- Date of follow-up 1 -->
+	<dataValues>
+		<de-code col="2">PYaAZcrsJhm</de-code><!-- Data centre ID -->
+		<de-code col="3">CTfjT04hU8Z</de-code><!-- Follow-up done -->
+		<de-code col="4">m0gslEx3Tz5</de-code><!-- Provider visited -->
+		<de-code col="5">m31Yyi4la42</de-code><!-- Reason for not visiting provider -->
+		<de-code col="6">Xeva0bS8RmG</de-code><!-- Short term method used? -->
+		<de-code col="7">wb8L25rQSsd</de-code><!-- If yes, Short term method -->
+		<de-code col="8">Ho8Jo7DuYV6</de-code><!-- Referral token given -->	
+	</dataValues>
+</event1>
+
+<event2>
+	<date col="10"></date><!-- Date of follow-up 2 -->
+	<dataValues>
+		<de-code col="11">PYaAZcrsJhm</de-code><!-- Data centre ID -->
+		<de-code col="12">CTfjT04hU8Z</de-code><!-- Follow-up done -->
+		<de-code col="13">m0gslEx3Tz5</de-code><!-- Provider visited -->
+		<de-code col="14">m31Yyi4la42</de-code><!-- Reason for not visiting provider -->
+		<de-code col="15">Xeva0bS8RmG</de-code><!-- Short term method used? -->
+		<de-code col="16">wb8L25rQSsd</de-code><!-- If yes, Short term method -->
+		<de-code col="17">Ho8Jo7DuYV6</de-code><!-- Referral token given -->	
+	</dataValues>
+</event2>
+
+</de-codes>
