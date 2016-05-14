@@ -117,21 +117,24 @@ trackerCapture
                 // this will add association to event
                 // get all events of this TEI and extract all event members to add to this event
                 AjaxCalls.getAllEventsByTEI(event.trackedEntityInstance).then(function (data) {
-
                     var allEventMembers = thiz.extractAllEventMembers(data.events);
-                    if (allEventMembers.length > 0) {
-                        event.eventMembers = allEventMembers;
-                    }
-                    DHIS2EventFactory.update(event).then(function(response){
-                        if (response.httpStatus == "OK"){
-                            console.log("EventMembers added successfully");
-                            $timeout(function () {
-                                $rootScope.$broadcast('association-widget', {event : event , show :true});
-                            });
-                        }else{
-                            console.log("An unexpected thing occurred.");
+
+                    AjaxCalls.getEventbyId(event.event).then(function(freshEvent){
+                        if (allEventMembers.length > 0) {
+                            freshEvent.eventMembers = allEventMembers;
                         }
+                        DHIS2EventFactory.update(freshEvent).then(function(response){
+                            if (response.httpStatus == "OK"){
+                                console.log("EventMembers added successfully");
+                                $timeout(function () {
+                                    $rootScope.$broadcast('association-widget', {event : freshEvent , show :true});
+                                });
+                            }else{
+                                console.log("An unexpected thing occurred.");
+                            }
+                        })
                     })
+
                 })
 
             },
