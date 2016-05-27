@@ -5,7 +5,7 @@ var lastRowNo = 0 ;
 //var successCount = 0;
 var successCount = 0;
 
-function importData(sheetName, lastRow){
+function importData(sheetName, lastRow){debugger
     // import data
     console.log('sheet Name '+ sheetName);
     endRow = lastRow;
@@ -32,7 +32,7 @@ function importData(sheetName, lastRow){
     });
 }
 
-function importExcelData(trackedEntityInstanceObj, enrollmentObj, eventObj, row){
+function importExcelData(trackedEntityInstanceObj, enrollmentObj, eventObj, row){debugger
     var errorCount = 0;
     importCount++;
 
