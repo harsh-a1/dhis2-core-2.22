@@ -28,6 +28,7 @@
                    ng-model="selectedEnrollment.enrollmentDate" 
                    max-date="selectedProgram.selectEnrollmentDatesInFuture ? '' : 0"
                    min-date=""
+                   ng-disabled="true"
                    ng-required="true"/>
             <input type="text" class="form-control not-for-screen"/>
             <span ng-show="outerForm.submitted && outerForm.enrollmentDate.$invalid" class="error">{{'required'| translate}}</span>
@@ -45,7 +46,6 @@
                    d2-date 
                    max-date="selectedProgram.selectIncidentDatesInFuture ? '' : 0"
                    min-date=""
-                   ng-disabled="true"
                    ng-model="selectedEnrollment.incidentDate"/>
             <input type="text" class="form-control not-for-screen"/>
         </td>

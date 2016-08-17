@@ -102,7 +102,7 @@
                 <button type="button" 
                         class="btn btn-primary"
                         ng-click="showRegistration()"
-                        ng-if="model.selectedProgram == 'TbYUPaBChYR' || model.selectedProgram == 'vIJHjWjDjwv' || model.selectedProgram == 'bmV01XjtusU' " ng-disabled='true'>
+                        ng-if="model.selectedProgram.id != 'TbYUPaBChYR' && model.selectedProgram.id != 'vIJHjWjDjwv' && model.selectedProgram.id && 'bmV01XjtusU' " ng-show = "true">
                     {{registerLabel}}
                 </button>
                 <button type="button"
