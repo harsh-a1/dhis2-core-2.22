@@ -170,8 +170,8 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
     }
 
     function loadDataX() {
-
-        def_stage1 = $.Deferred();
+ //  
+  def_stage1 = $.Deferred();
         def_stage2 = $.Deferred();
         def_stage3 = $.Deferred();
         def_stage4 = $.Deferred();
@@ -205,13 +205,13 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                         "<th rowspan='2'><center>Provider Code</center></th>"+
                         "<th rowspan='2'  bgcolor='#F2DDDC'><center>Provider Name</center></th></tr>"+
 
-                        "<tr><th colspan='1' bgcolor='#F2DDDC'>PK RH FP-Clients followed-up</th>"+
-                        "<th colspan='1' bgcolor='#F2DDDC'>PK RH FP-IPC FFM first client MWRA ID</th>"+
-                        "<th colspan='1' bgcolor='#F2DDDC'>PK RH FP-IPC FFM referral tokens issued</th>"+
-                        "<th colspan='1' bgcolor='#F2DDDC'>PK RH FP IPC FFM last client MWRA ID</th>"+
-                        "<th colspan='1' bgcolor='#F2DDDC'>PK RH FP-Orientation meeting participants</th>"+
-                        "<th colspan='1' bgcolor='#F2DDDC'>PK RH FP-Neighbourhood meeting participants</th>"+
-                        "<th colspan='1' bgcolor='#F2DDDC'>PK RH FP-IPC FFM clients visited</th></tr>"
+                        "<tr><th colspan='1' bgcolor='#F2DDDC'>Clients Followed-Up</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>First Client MWRA ID</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Referral Tokens Issued</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Last Client MWRA ID</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Orientation meeting participants</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Neighbourhood meeting participants</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Clients visited</th></tr>"
 
 
                 ;
@@ -220,11 +220,12 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
         $('#datavalue1').html("");
 
         $('#datavalue1').append(headerHtml);
+	//	tableDataHtml="";
          tableDataHtml = "<tbody><tr>";
-   //     $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage1+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=dvLvzUaJeQh&dimension=gBdx1XMCySe&dimension=sBD5FEalBsU&displayProperty=NAME", function(data){
+   
 
-        // data for neihbourhood meeting
-        $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage1+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=sBD5FEalBsU&dimension=zNq2hXkOTga&dimension=ZBdTzQfOkOK&dimension=SxSh9297ihW&dimension=dvLvzUaJeQh&dimension=gBdx1XMCySe&dimension=sBD5FEalBsU&displayProperty=NAME", function(data){
+        // data for neighbourhood meeting
+        $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage1+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=sBD5FEalBsU&dimension=zNq2hXkOTga&dimension=ZBdTzQfOkOK&dimension=SxSh9297ihW&dimension=dvLvzUaJeQh&dimension=gBdx1XMCySe&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data){
            // def_stage1 = $.Deferred();
 
             var ids;
@@ -251,12 +252,6 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                     tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][11] + "</center></td>";
                     tableDataHtml = tableDataHtml + "<td><center>" +( (data.rows[i][12])*(10^11)) + "</center></td>";
 
-//                for (ids in data) {
-//                    if (data.metaData.names.hasOwnProperty("mDwBhWDmLfr")) {
-//                        console.log("value--" + data.metaData.names["mDwBhWDmLfr"]);
-//                    }
-//
-//                }
                     tableDataHtml = tableDataHtml + "<td><center>" + data.metaData.names["mDwBhWDmLfr"] + "</center></td>";
 
                     tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
@@ -277,7 +272,7 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                     else{
 
                    //for old_providerid : ndf6du48Fy5
-                      // $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data.rows[i][14], function (json3) {
+                  
 
                           // for new provider id --L0bSL88vvdz
                             $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data.rows[i][9], function (json3) {
@@ -305,17 +300,15 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                         });
 
                     }
-                  //  tableDataHtml="<tr>"+tableDataHtml+"</tr>";
-
+                  
 
 
 
             }
 
-          //  $('#datavalue1').append(tableDataHtml);
-
+       
 // data for follow up visits
-            /*$.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage2+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=NoGwMfqdSOY&dimension=gBdx1XMCySe&displayProperty=NAME",function(data1){
+            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage2+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=NoGwMfqdSOY&dimension=gBdx1XMCySe&displayProperty=NAME&desc=EVENTDATE",function(data1){
             //    def_stage2 = $.Deferred();
                 headerHtml = headerHtml + "</tr></thead>";
                // $('#datavalue1').html("");
@@ -325,19 +318,14 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                 var ids;
                 for (var i = 0; i < data1.rows.length; i++) {
 
+			//	if( data1.rows[i][9]  == 'Female'){
                     tableDataHtml1 = tableDataHtml1 + "<td><center>" + (data.rows.length+i+1) + "</center></td>";
                     tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][2] + "</center></td>";
                     tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][8] + "</center></td>";
                     tableDataHtml1 = tableDataHtml1 + "<td><center>" +data1.rows[i][10] + "</center></td>";
                     tableDataHtml1 = tableDataHtml1 + "<td><center>" +data1.rows[i][9] + "</center></td>";
-                    tableDataHtml1 = tableDataHtml1 + "<td><center>" +((data2.rows[i][11])*(10^11)) + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" +((data1.rows[i][11])*(10^11)) + "</center></td>";
 
-                    for (ids in data1) {
-                        if (data1.metaData.names.hasOwnProperty("hVVdocIy72g")) {
-                            console.log("value--" + data1.metaData.names["hVVdocIy72g"]);
-                        }
-
-                    }
                     tableDataHtml1 = tableDataHtml1 + "<td><center>" +  data1.metaData.names["hVVdocIy72g"] + "</center></td>";
 
                     tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][14] + "</center></td>";
@@ -350,17 +338,45 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                     tableDataHtml1 = tableDataHtml1 + "<td><center>" + 'NA' + "</center></td>";
 
                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + "Provider code invalid" + "</center></td>";
+				   
 
                     tableDataHtml1="<tr>"+tableDataHtml1+"</tr>";
-                    def_stage2.resolve("");
-                }
+                 
+				//	} // end if
+				/*	else if(data1.rows[i][9]  == 'Male'){
+					 tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + (data.rows.length+i+1) + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][2] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][8] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +data1.rows[i][10] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +data1.rows[i][9] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +((data1.rows[i][11])*(10^11)) + "</center></td>";
 
-                tableDataHtml1 = tableDataHtml1 + "</tbody>";*/
-               // $('#datavalue1').append(tableDataHtml,tableDataHtml1);
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +  data1.metaData.names["hVVdocIy72g"] + "</center></td>";
+
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][14] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][12] + "</center></td>";
+                    tableDataHtml1= tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][15] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][13]  + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +  'NA'+ "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+
+                   tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
+
+                    tableDataHtml1="<tr>"+tableDataHtml1+"</tr>";
+                   
+					}*/
+                }// end for loop
+
+                tableDataHtml1 = tableDataHtml1 + "</tbody>";
+				
+                            def_stage2.resolve("");
+           
 
 // orientation meeting data
-               // $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage3+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=Pusk3tS9CEP&dimension=sBD5FEalBsU&displayProperty=NAME",function(data2) {
-            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage3+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=Pusk3tS9CEP&dimension=sBD5FEalBsU&displayProperty=NAME", function(data2){
+             
+            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage3+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=Pusk3tS9CEP&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data2){
                 //    def_stage3 = $.Deferred();
                     headerHtml = headerHtml + "</tr></thead>";
                   //  $('#datavalue1').html("");
@@ -441,8 +457,8 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                    }
                 // data for area mapping
 
-                  //  $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage4+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=o6FuT7EWKRm&dimension=uCRq37mPHne&displayProperty=NAME",function(data3) {
-                $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage4+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=sBD5FEalBsU&displayProperty=NAME", function(data3){
+                 
+                $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage4+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data3){
                    //     def_stage4 = $.Deferred();
                         headerHtml = headerHtml + "</tr></thead>";
                        // $('#datavalue1').html("");
@@ -464,30 +480,29 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                             }
                             var i= index;
 
-                          /*  if ((data.rows.length+ data2.rows.length +i + 1) == 22){
-                                debugger
-                            }*/
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + (data.rows.length+ data2.rows.length +i) + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + data3.rows[i][2] + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + data3.rows[i][8] + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + data3.rows[i][10] + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" +data3.rows[i][9] + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" +((data2.rows[i][11])*(10^11)) + "</center></td>";
+                       // if(data3.rows[i][9] == 'Male'){
+						
+						 tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + (data.rows.length+ data2.rows.length +i) + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][2] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][8] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][10] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" +data3.rows[i][9] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'<center>" +((data3.rows[i][11])*(10^11)) + "</center></td>";
 
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + data3.metaData.names["k7gHjJ4LFOU"] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.metaData.names["k7gHjJ4LFOU"] + "</center></td>";
 
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + 'NA' + "</center></td>";
-                                tableDataHtml3= tableDataHtml3 + "<td><center>" + 'NA' + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + 'NA'+ "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + 'NA' + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + 'NA' + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + 'NA' + "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" +  'NA'+ "</center></td>";
-                                tableDataHtml3 = tableDataHtml3 + "<td><center>" + data3.rows[i][12] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3= tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA'+ "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" +  'NA'+ "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][12] + "</center></td>";
 
                                 if(data.rows[i][12] =="") {
 
-                                    tableDataHtml3 = tableDataHtml3 + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                    tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
                                     completeRow_stage4(index,data);
 
                                 }
@@ -497,7 +512,7 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
 
                                         if(json11.trackedEntityInstances.length ==0) {
 
-                                            tableDataHtml3 = tableDataHtml3 + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                            tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
                                             completeRow_stage4(index,data);
 
 
@@ -508,7 +523,7 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                                             {
                                                 if (json11.trackedEntityInstances[0].attributes[j].displayName == 'Name') {
 
-                                                    tableDataHtml3 = tableDataHtml3 + "<td><center>" + json11.trackedEntityInstances[0].attributes[j].value + "</center></td>";
+                                                    tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + json11.trackedEntityInstances[0].attributes[j].value + "</center></td>";
                                                     completeRow_stage4(index,data);
 
                                                 }
@@ -517,12 +532,15 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                                         }
                                     });
                                 }
-                        }
-
+						
+						//}// end if--male
+						
+						
+						} // end function
                       //  $('#datavalue1').append(tableDataHtml, tableDataHtml1, tableDataHtml2,tableDataHtml3);
 // data for house hold visits
-                      //  $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage5+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:tZJsIdHAfKq&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=nUqWTyxWCZs&dimension=gBdx1XMCySe&displayProperty=NAME",function(data4) {
-                    $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage5+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=nUqWTyxWCZs&dimension=gBdx1XMCySe&displayProperty=NAME", function(data4){
+                  
+                    $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage5+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=nUqWTyxWCZs&dimension=gBdx1XMCySe&displayProperty=NAME&desc=EVENTDATE", function(data4){
                             headerHtml = headerHtml + "</tr></thead>";
                           //  $('#datavalue1').html("");
                           //  $('#datavalue1').append(headerHtml);
@@ -531,18 +549,15 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                             var ids;
                             for (var i = 0; i < data4.rows.length; i++) {
 
+						//	if (data4.rows[i][9] == 'Female')
+						//	{
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + (data.rows.length+ data2.rows.length +data3.rows.length+i) + "</center></td>";
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][2] + "</center></td>";
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][8] + "</center></td>";
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][10] + "</center></td>";
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" +data4.rows[i][9] + "</center></td>";
-                                tableDataHtml4 = tableDataHtml4 + "<td><center>" +((data2.rows[i][11])*(10^11)) + "</center></td>";
-                                for (ids in data4) {
-                                    if (data4.metaData.names.hasOwnProperty("n2CFuvwUvnh")) {
-                                        console.log("value--" + data4.metaData.names["n2CFuvwUvnh"]);
-                                    }
-
-                                }
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" +((data4.rows[i][11])*(10^11)) + "</center></td>";
+                               
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.metaData.names["n2CFuvwUvnh"] + "</center></td>";
 
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
@@ -556,7 +571,10 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
 
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + "Provider code invalid" + "</center></td>";
                                 tableDataHtml4 = "<tr>" + tableDataHtml4 + "</tr>";
-                            }
+							//}
+								
+								
+                            }// end for
 
                             tableDataHtml4 = tableDataHtml4 + "</tbody>";
                             def_stage5.resolve("");
@@ -571,10 +589,10 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
                 });
             });
 
-     //   });
+      });
 
-        $.when(def_stage1,def_stage3,def_stage4,def_stage5).done(function(){
-            $('#datavalue1').append(tableDataHtml, tableDataHtml2,tableDataHtml3,tableDataHtml4);
+        $.when(def_stage1,def_stage2,def_stage3,def_stage4,def_stage5).done(function(){
+            $('#datavalue1').append(tableDataHtml, tableDataHtml1,tableDataHtml2,tableDataHtml3,tableDataHtml4);
 
         });
 
