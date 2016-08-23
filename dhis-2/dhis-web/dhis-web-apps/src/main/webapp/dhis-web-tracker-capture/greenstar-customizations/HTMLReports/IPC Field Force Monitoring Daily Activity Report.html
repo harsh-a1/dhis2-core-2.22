@@ -400,7 +400,7 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
 
                      //   for (var i = 0; i < data2.rows.length; i++) {
 
-                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + (data.rows.length+ i ) + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" +(data.rows.length+i+data1.rows.length-1)  + "</center></td>";
                         tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][2] + "</center></td>";
                         tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][8] + "</center></td>";
                         tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][10] + "</center></td>";
@@ -551,7 +551,7 @@ var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
 
 						//	if (data4.rows[i][9] == 'Female')
 						//	{
-                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + (data.rows.length+ data2.rows.length +data3.rows.length+i) + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + (data.rows.length+ data2.rows.length +data3.rows.length+i+data1.rows.length+1) + "</center></td>";
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][2] + "</center></td>";
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][8] + "</center></td>";
                                 tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][10] + "</center></td>";
