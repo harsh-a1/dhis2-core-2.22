@@ -9,12 +9,19 @@
 	var orgUnitUIDs = "";
 	var res = "";
 	var orgUnitGroup =[],orgUnitChildrenFromGroup=[],  userGroupAccesses =[],  orgGroups =[],orgUnitGroupName=[] ,  userGroupId =[];
+	var selectedOu, orgUnitGroup1;
 	res.length=0;
 	var prgUID = "icAx8KDM1WT";	
 	var tableDX = [ 
 					
-					{ dxName: "PK RH FP-Referral token redeemed", dxId: "ESepPV8NxUd", cocId: "" },	
-							
+					{ dxName: "Condoms", dxId: "Nr8JvumTkmZ", cocId: "" },
+					{ dxName: "Oral contraceptive pills", dxId: "XWBvNBGaek0", cocId: "" },
+					{ dxName: "Implants", dxId: "vhGvAwK7doe", cocId: "" },
+					{ dxName: "Injectable", dxId: "fftwX6D3iuI", cocId: "" },
+				//	{ dxName: "Injectable (two month)", dxId: "Y3sftYIwjSx", cocId: "" },
+				//	{ dxName: "Injectable (three month)", dxId: "vMISOrzIDPL", cocId: "" },
+				//	{ dxName: "IUCD safe load", dxId: "lO9hVUqHo9v", cocId: "" },
+					{ dxName: "IUCD", dxId: "xi0iWC3fLH5", cocId: "" },			
 				];
 				
 	
@@ -40,6 +47,7 @@ var me = data2.id;
 			//orgGroups.push(data1.organisationUnitGroups[i].id);
 		   
 		   $.getJSON("../api/organisationUnitGroups/"+data1.organisationUnitGroups[i].id+".json", function(data3){
+		    var orgname=[];
 		   
 		   if(data3.userGroupAccesses.length>0 && userGroupId.length>0){
 	//	 if(data3.userGroupAccesses.length>0){
@@ -49,6 +57,7 @@ var me = data2.id;
 		   if (userGroupId == data3.userGroupAccesses[j].userGroupUid){
 		    orgUnitGroup.push( data3.id);
 			orgUnitGroupName.push(data3.displayName);
+			orgname.push(data3.displayName);
 		   }
 		   }
 		   }
@@ -56,7 +65,7 @@ var me = data2.id;
 		 //  orgUnitGroupName.push( "No orgUnit group shared to this user");
 		 //  }
 		 console.log("orgUnitGroup---"+orgUnitGroup+"orgUnitGroupName--"+orgUnitGroupName);
-		  $.each(orgUnitGroupName, function (index, item) { // append orgunit name in dropdown menu
+		  $.each(orgname, function (index, item) { // append orgunit name in dropdown menu
                     $('#dropdown').append(
                            // $('<option></option>').val(item.id).html(item).text(item.name)
 							 $('<option></option>').val(item).html(item).text(item)
@@ -70,8 +79,22 @@ var me = data2.id;
  });
  });
   });
-	
-	
+   $("#dropdown").change(function () {
+               // alert($(this).val());
+			   selectedOu = $(this).val();
+			   console.log("selectedOu-------"+selectedOu);
+			    document.getElementById("selectedOUName1").innerHTML = selectedOu;
+				
+				$.get("../api/organisationUnitGroups.json", function(oGroup){
+				
+				for(var i=0;i<oGroup.organisationUnitGroups.length;i++){
+				if(selectedOu == oGroup.organisationUnitGroups[i].displayName){
+				orgUnitGroup1 = oGroup.organisationUnitGroups[i].id;
+				}
+				}
+				})
+			
+            });
 		//validateReport();
 		$(".hideInPrint").hide();
 		orgUnitChildren.sort( function( a, b ){
@@ -89,7 +112,8 @@ var me = data2.id;
 		$.each( orgUnitChildren, function () {
 			orgUnitUIDs += this.id + ";";		
 		});
-		$( "#datepicker" ).datepicker({  dateFormat: "mm/dd/yy"});
+		
+		   $( "#datepicker" ).datepicker({  dateFormat: "mm/dd/yy"});
         $( "#datepicker1" ).datepicker({  dateFormat: "mm/dd/yy"});
 		//loadData();
 		
@@ -148,7 +172,7 @@ var me = data2.id;
 
 	var periodArray = [];
 	//var cYear = parseInt( gotPeriod.substring(0,4) );
-	//var cMonth = parseInt( gotPeriod.substring(4,6) );
+//	var cMonth = parseInt( gotPeriod.substring(4,6) );
 	//var periodsStr = gotPeriod.substring(0,4)+""+gotPeriod.substring(4,6);
 		
 	var jsonData1;
@@ -156,8 +180,8 @@ var me = data2.id;
 	var jsonData3;
 		
 	function loadData()
-	{		
-	var orgUid;
+	{	
+var orgUid;
           /*  $("#dropdown").change(function () {
                 selectedText = $(this).find("option:selected").text();
                 orgUid = $(this).find("option:selected").val();
@@ -170,12 +194,9 @@ var me = data2.id;
                 alert("Select OrganisationUnit");
                 return;
             }
-var start = document.getElementById('datepicker').value;
-	
+	var start = document.getElementById('datepicker').value;
 			startDate = start.split("/").reverse().join("-");
-
 			var end = document.getElementById('datepicker1').value;
-				
 			if (start == undefined || end == undefined || start =="" || end =="") {
                 alert("Select Start date and End date");
                 return;
@@ -183,21 +204,12 @@ var start = document.getElementById('datepicker').value;
 			endDate = end.split("/").reverse().join("-");
 			 document.getElementById('period1').innerHTML=start;
         document.getElementById('period2').innerHTML=end;
-					
 			var sstart= new Date(start);
 	var edate= new Date(end);
-
-    		
     		var timeDiff = Math.abs(sstart.getTime() - edate.getTime());
 var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-			
-			
-			
-			
 var inc =0;
-       
-
-			var edate= new Date(end);
+       var edate= new Date(end);
 			
 			while(inc<=diffDays)
 			{
@@ -213,21 +225,17 @@ var inc =0;
 		 date = year+''+month+''+date1+';';
 		  
 res = res.concat(date);
-		
-		//console.log("date"+date);
-		
-			sstart.setDate(sstart.getDate() + 1);
+sstart.setDate(sstart.getDate() + 1);
 			
 inc= inc+1;
 
 			}
-res = res.substring(0,res.length - 1);	
-	
-		document.getElementById('selectedOUName').innerHTML= orgUnitGroupName;
+res = res.substring(0,res.length - 1);					
+//document.getElementById('selectedOUName').innerHTML=orgUnitGroupName;
 		//document.getElementById('period').innerHTML=getPeriod(gotPeriod);
 		
-		var orgUnitUIDsFromGroup ="-1";
-		$.get("../api/organisationUnitGroups/"+orgUnitGroup+".json?fields=id,displayName,organisationUnits[id,name]", function(json1)
+	var orgUnitUIDsFromGroup ="-1";
+		$.get("../api/organisationUnitGroups/"+orgUnitGroup1+".json?fields=id,displayName,organisationUnits[id,name]", function(json1)
 	{
 		for(var i=0; i<json1.organisationUnits.length;i++ ){
 		orgUnitUIDsFromGroup += ";"+json1.organisationUnits[i].id;
@@ -240,6 +248,7 @@ res = res.substring(0,res.length - 1);
 		}
 			console.log("orgUnitUIDsFromGroup----"+orgUnitUIDsFromGroup);
 		var url = "../api/analytics.json?dimension=dx:"+ deUIDs +"&dimension=ou:"+ orgUnitUIDsFromGroup +"&filter=pe:"+ res+"&program="+prgUID;
+		
 		//var url = "../api/analytics.json?dimension=dx:"+ deUIDs +"&dimension=ou:"+ orgUnitUIDs +"&filter=pe:"+ res +"&program="+prgUID;
 		console.log( url );
 		$.get(url, function(json)
@@ -254,8 +263,7 @@ res = res.substring(0,res.length - 1);
 			
 			loadReport( );
 		});	
-		});	
-			
+			});	
 	}
 	
 	function loadReport( )
@@ -276,12 +284,12 @@ res = res.substring(0,res.length - 1);
 		
 		$("#"+showingTable+" > tbody").html("");
 		htmlReport += "<tbody>";
-		//$.each( orgUnitChildren, function ( index1, ou ) {			
-		$.each( orgUnitChildrenFromGroup, function ( index1, ou ) {			
+		$.each( orgUnitChildrenFromGroup, function ( index1, ou ) {	
+	//	$.each( orgUnitChildren, function ( index1, ou ) {			
 			htmlReport+="<tr>";						
 			htmlReport+="<td align='left'style='padding-left:5px'>"+ou.name+"</td>";
 			$.each( tableDX, function ( index2, de ) {
-				var temp = getCellValue( jsonData1, de.dxId, ou.id, res );
+				var temp = getCellValue( jsonData1, de.dxId, ou.id, res);
 				htmlReport+="<td align='center'>"+ temp +"</td>";
 			});			
 			htmlReport+="</tr>";	
@@ -292,7 +300,7 @@ res = res.substring(0,res.length - 1);
 		hideLoad();
 	}
 
-	function getCellValue( json, de, ou, res)
+	function getCellValue( json, de, ou, res )
 	{
 		var result=0;
 		for (var i=0; i < json.rows.length; i++)
@@ -300,7 +308,7 @@ res = res.substring(0,res.length - 1);
 			//console.log( json.rows[i][0] + " : " + json.rows[i][1] + " : " + json.rows[i][2] + " : " + json.rows[i][3] );
 			//console.log( de + " : " + ou + " : " + coc );
 			//console.log( "********************************************" );
-			if( json.rows[i][0] == de && json.rows[i][1] == ou && json.rows[i][2]!= null )
+			if( json.rows[i][0] == de  && json.rows[i][1] == ou && json.rows[i][2]!= null )
 			{
 				result=json.rows[i][2];
 			}
@@ -477,12 +485,11 @@ res = res.substring(0,res.length - 1);
 			transform: rotate(90deg); 
 			border-style: hidden;*/
 	}
-		select {
+			select {
         height:30px;
         line-height:10px;
         background:#f4f4f4;
     } 
-		
 </style>
 
 
@@ -490,10 +497,9 @@ res = res.substring(0,res.length - 1);
 <table>
 	<tr>
 		<td>
-			<input type="button" id="btnBack" value=" Go to Dashboard" onclick="location.href='../dhis-web-dashboard-integration/index.action'"/>
+			<input type="button" id="btnBack" value=" Goto Report Selection Page" onclick="location.href='../dhis-web-reports-app/index.html#/generate-report'"/>
             <input type="button"  onclick="printContent('printing');" value="Print"/>
-			<!--<input type="button" id="btnExport" value=" Download Excel " />-->
-				
+			<input type="button" id="btnExport" value=" Download Excel " />
 				
 		</td>	
 	</tr>
@@ -507,14 +513,12 @@ res = res.substring(0,res.length - 1);
     <tr>
         <td><input type="text" id="datepicker"></td>
         <td><input type="text" id="datepicker1"></td>
-     <select id="dropdown" value="base" style=" margin-left:1%; width:10%; ">
+       <select id="dropdown" value="base" style=" margin-left:1%; width:10%; ">
                 <option selected value="base" class="dropbtn">Select OrgUnit Group</option>
             </select>
         <td>	<input type="button"  onClick="loadData()"  value="go" style="width:50px;margin-left:50%; margin-top:5px;"/>	</td>
     </tr>
 </table>
-</br></br>
-
 <div id="printing">
 	<table >
 		<tr>
@@ -522,13 +526,13 @@ res = res.substring(0,res.length - 1);
 				<table border="1" cellspacing="6" cellpadding="4"   width="100%" style="border-collapse:collapse; border:2px; font-weight:bolder" >
 					<thead>
 						<tr align="center"  height="27">
-							<td  colspan="12" width="2082" height="27" class="col" bgcolor="#32849C" ><font color="white"><b>Token Redemption at Health Service Provider Report</b></font></td>
+							<td  colspan="12" width="2082" height="27" class="col" bgcolor="#32849C" ><font color="white"><b>Methods Adopted by Clients Report</b></font></td>
 						</tr>
 						<tr bgcolor="#F2DDDC" align="center" height="20">
 							<td colspan="1" height="20" align="right"><b>Parent OU:</b></td>
-							<td colspan="2" id="selectedOUName">&nbsp;</td>				
+							<td colspan="2" id="selectedOUName1">&nbsp;</td>				
 							<td colspan="5">&nbsp;</td>				
-							<td colspan="1" align="right"><b>Start Date: </b></td>
+							 <td colspan="1" align="right"><b>Start Date: </b></td>
                 <td colspan="1" id="period1">&nbsp;</td>
                 <td colspan="1" align="right"><b>End Date: </b></td>
                 <td colspan="1" id="period2">&nbsp;</td>	
