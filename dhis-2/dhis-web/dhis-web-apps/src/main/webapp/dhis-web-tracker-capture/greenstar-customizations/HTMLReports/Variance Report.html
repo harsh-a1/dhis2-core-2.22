@@ -9,8 +9,8 @@
 
 
     var prgUID = "TbYUPaBChYR";
-    var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
-    var tableDataHtml, tableDataHtml1, tableDataHtml2,tableDataHtml3,tableDataHtml4;
+    var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5,def_stage6;
+    var tableDataHtml, tableDataHtml1, tableDataHtml2,tableDataHtml3,tableDataHtml4,tableDataHtml5;
     var stage1 ="pPdawAo0LkG"; //IPC workplan
     var stage2 ="OMHUToxZR03"; //orientation meeting
     var stage3="mDwBhWDmLfr"; //neighbourhood meeting
@@ -57,7 +57,21 @@
     var showingTable = "datavalue1";
 
     jQuery(document).ready(function () {
+        $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&trackedEntity=lLKXYUBAAMy", function (json3) {
 
+
+            $.each(json3.trackedEntityInstances, function (index, item) {
+                $.each(item.attributes, function (index1, item1) {
+
+                    if (item1.code == "Firstname") {
+                        $('#workerdropdown').append(
+                                $('<option></option>').val(item.trackedEntityInstance).html(item1.value).text(item1.value)
+                        );
+                    }
+                });
+            });
+
+        });
         //validateReport();
         $(".hideInPrint").hide();
         orgUnitChildren.sort(function (a, b) {
@@ -175,6 +189,7 @@
         def_stage3 = $.Deferred();
         def_stage4 = $.Deferred();
         def_stage5 = $.Deferred();
+        def_stage6 = $.Deferred();
 
         var a = document.getElementById('datepicker').value;
         startDate = a.split("/").reverse().join("-");
@@ -238,8 +253,46 @@
                         //AM
                         $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage=" + stage5 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit + "&dimension=zNq2hXkOTga&dimension=sBD5FEalBsU&dimension=MCJaNkHvR4k&displayProperty=NAME&desc=EVENTDATE", function (data4) {
                             //FV
-                            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage=" + stage5 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit + "&dimension=zNq2hXkOTga&dimension=sBD5FEalBsU&dimension=MCJaNkHvR4k&displayProperty=NAME&desc=EVENTDATE", function (data5) {
-
+                            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage=" + stage6 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit + "&dimension=zNq2hXkOTga&dimension=sBD5FEalBsU&dimension=MCJaNkHvR4k&displayProperty=NAME&desc=EVENTDATE", function (data5) {
+                                /* var count = 0, count1 = 0, count2= 0, count3= 0, count4 = 0, d;
+                                for(i=0; i<data.rows.length;i++){
+                                    for(j=0; j<data1.rows.length;j++){
+                                        if(data.rows[i][2] == data1.rows[j][2]){
+                                            count++;
+                                        }
+                                    }
+                                }
+                                for(i=0; i<data.rows.length;i++){
+                                    for(j=0; j<data2.rows.length;j++){
+                                        if(data.rows[i][2] == data2.rows[j][2]){
+                                            count1++;
+                                        }
+                                    }
+                                }
+                                for(i=0; i<data.rows.length;i++){
+                                    for(j=0; j<data3.rows.length;j++){
+                                        if(data.rows[i][2] == data3.rows[j][2]){
+                                            count2++;
+                                        }
+                                    }
+                                }
+                                for(i=0; i<data.rows.length;i++){
+                                    for(j=0; j<data4.rows.length;j++){
+                                        if(data.rows[i][2] == data4.rows[j][2]){
+                                            count3++;
+                                        }
+                                    }
+                                }
+                                for(i=0; i<data.rows.length;i++){
+                                    for(j=0; j<data5.rows.length;j++){
+                                        if(data.rows[i][2] == data5.rows[j][2]){
+                                            count4++;
+                                        }
+                                    }
+                                }
+                                c =(count+count1+count2+count3+count4);
+                               d= c-data.rows.length;
+                                console.log("count----"+(count+count1+count2+count3+count4));*/
                                 populateData(0, data);
 
                                 function completeRow(index, data) {
@@ -248,8 +301,9 @@
 
                                 }
 
+
                                 function populateData(index, data) {
-                                    if (index == data.rows.length) {
+                                    if (index == (data.rows.length)) {
                                         def_stage1.resolve("");
                                         return
                                     }
@@ -270,59 +324,66 @@
                                     tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][10] + "</center></td>";
                                     tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][9] + "</center></td>";
 
+
                                     if (data.rows[i][10] == 'Orientation meeting') {
                                         for (j = 0; j < data1.rows.length; j++) {
                                             if (data.rows[i][2] == data1.rows[j][2]) { // event date matches
                                                 if (data.rows[i][8] == data1.rows[j][8]) { //IPC code matches
                                                     if (data.rows[i][9] == data1.rows[j][9]) { //provider code matches
-                                                        /*if (data.rows[i][10] == 'Orientation meeting') {// activity matches
-                                            variance = 0;
-                                            tableDataHtml = tableDataHtml + "<td><center>" + "Orientation meeting" + "</center></td>";
-                                            tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][9] + "</center></td>";
-                                            tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
-                                            break;
-                                        }*/
-                                                        //else {
+
                                                         variance = 0;
                                                         tableDataHtml = tableDataHtml + "<td><center>" + "Orientation meeting" + "<center></td>";
                                                         tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][9] + "</center></td>";
                                                         tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][10] + "</center></td>";
                                                         tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
-                                            break;
-                                       // }
-                                    }
-                                    else {
-                                            variance = 100;
+                                                        break;
+
+                                                    }
+                                                    else {
+                                                        variance = 100;
+
                                                         tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                            tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                                                        tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
                                                         tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][10] + "</center></td>";
-                                            tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
-                                            break;
+                                                        tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+                                                        break;
+                                                    }
+
+
+                                                }
+                                                /*   else {
+                                                    variance = 100;
+                                                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                                                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                                                    tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][10] + "</center></td>";
+                                                    tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+                                                    break;
+                                                }*/
+
+                                            }
+                                            else { // event date doesnt match
+                                                variance = 100;
+                                                tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][10] + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+                                                break;
+                                            }
+                                        }
+                                        //if only event date matches, then insert that row of orientation meeting
+//                                        if ((data.rows[i][10] == 'Orientation meeting') && (data.rows[i][2] == data1.rows[j][2]) && (data.rows[i][8] != data1.rows[j][8])&&(data.rows[i][9] != data1.rows[j][9]))  { // event date of orientation matches with IPC workplan then insert one row
+//
+//                                            variance = 100;
+//                                            tableDataHtml = tableDataHtml + "<td><center>" + "orientation meeting" + "</center></td>";// activity type
+//                                            tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][9] + "</center></td>";// provider code
+//                                            tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][10] + "</center></td>";//name
+//                                            tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+
+                                        //                                            // break;
+                                        //                                        }
+
                                     }
 
-
-                                }
-                                else {
-                                        variance = 100;
-                                        tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                        tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                                    tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][10] + "</center></td>";
-                                        tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
-                                        break;
-                                }
-
-                            }
-                            else {
-                                    variance = 100;
-                                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                                tableDataHtml = tableDataHtml + "<td><center>" + data1.rows[j][10] + "</center></td>";
-                                    tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
-                                    break;
-                            }
-                        }
-
-}
                         if(data.rows[i][10] == 'Neighbourhood meeting') {
                                 for (var k = 0; k < data2.rows.length; k++) {
                                     if (data.rows[i][2] == data2.rows[k][2]) { // event date matches
@@ -332,15 +393,17 @@
 //                                            variance = 0;
 //                                            tableDataHtml = tableDataHtml + "<td><center>" + "Neighbourhood meeting" + "</center></td>";
 //                                            tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[k][9] + "</center></td>";
-//                                            tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
-//                                            break;
+                                                //                                            tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+                                                //                                            break;
 //                                        }
                                                 //   else {
                                                 variance = 0;
                                                 tableDataHtml = tableDataHtml + "<td><center>" + "Neighbourhood meeting" + "</center></td>";
                                                 tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[j][10] + "</center></td>";
-                                                tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[j][10] + "</center></td>";
-                                                tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[j][10
+                                                                ] + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td><center>" +
+                                                        variance + "</center></td>";
                                                 break;
                                                 //  }
                                             }
@@ -348,7 +411,7 @@
                                                 variance = 100;
                                                 tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
                                                 tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                                tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[j][10] + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[j][10] + "</enter></td>";
                                                 tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
                                                 break;
                                             }
@@ -357,8 +420,9 @@
                                         }
                                         else {
                                             variance = 100;
-                                            tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                            tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                                            tableDataHtml = tableDataHtml + "<td><center>" + "" + " </center></td>";
+                                            tableDataHtml =
+                                                    tableDataHtml + "<td><center>" + "" + "</center></td>";
                                             tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[j][10] + "</center></td>";
                                             tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
                                             break;
@@ -374,18 +438,34 @@
                                         break;
                                     }
                                 }
+                            //if only event date matches, then insert that row of orientation meeting
+//                            if ((data.rows[i][10] == 'Neighbourhood meeting') && (data.rows[i][2] == data2.rows[j][2]) && (data.rows[i][8] != data2.rows[j][8])&&(data.rows[i][9] != data2.rows[j][9]))  { // event date of orientation matches with IPC workplan then insert one row
+//
+//                                variance = 100; //                                tableDataHtml = tableDataHtml + "<td><center>" + "Neighbourhood meeting" + "</center></td>";// activity type
+                            //                                tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[j][9] + "</center></td>";// provider code//                                tableDataHtml = tableDataHtml + "<td><center>" + data2.rows[j][10] + "</center></td>";//name
+//                                tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+
+                            //                                // break;
+                            //                            }
                             }
-                            if(data.rows[i][10] == 'Household visits') {
-                                for (var l = 0; l < data3.rows.length; l++) {
-                                    if (data.rows[i][2] == data3.rows[l][2]) { // event date matches
+                            if(
+                                    data.rows[i][10] == 'Household visits') {
+                                for (var l = 0
+                                        ; l < data3.rows.length; l++) {
+                                    if (data.rows[i][2
+                                                    ] == data3.rows[l][2]) { // event date matches
                                         if (data.rows[i][8] == data3.rows[l][8]) { //IPC code matches
-                                            if ( data3.rows[l][9] == '') { //no provider code is there in HH visit
+                                            if ( data3.rows[l][9] == '') {
+                                                //no provider code is there in HH visit
 
                                                 variance = 0;
                                                 tableDataHtml = tableDataHtml + "<td><center>" + "Household visits" + "</center></td>";
                                                 tableDataHtml = tableDataHtml + "<td><center>" + data3.rows[j][9]  + "</center></td>";
                                                 tableDataHtml = tableDataHtml + "<td><center>" + data3.rows[j][10] + "</center></td>";
-                                                tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+                                                tableDataHtml =
+
+
+                                                        tableDataHtml + "<td><center>" + variance + "</center></td>";
                                                 break;
 
                                             }
@@ -394,7 +474,8 @@
                                                 tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
                                                 tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
                                                 tableDataHtml = tableDataHtml + "<td><center>" + data3.rows[j][10] + "</center></td>";
-                                                tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td><center>" +
+                                                        variance + "</center></td>";
                                                 break;
                                             }
 
@@ -402,9 +483,13 @@
                                         }
                                         else {
                                             variance = 100;
+                                            tableDataHtml =
+                                                    tableDataHtml + "<td><center>" + "" + "</center></td>";
                                             tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                            tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                            tableDataHtml = tableDataHtml + "<td><center>" + data3.rows[j][10] + "</center></td>";
+                                            tableDataHtml = tableDataHtml +
+                                                    "<td><center>" + data3.rows[
+                                                            j][10
+                                                            ] + "</center></td>";
                                             tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
                                             break;
                                         }
@@ -420,25 +505,31 @@
                                     }
                                 }
                             }
-                                if(data.rows[i][10] == 'Area mapping') {
+                                    if(data.rows[i][10] ==
+
+                                            'Area mapping'
+                                    ) {
                                     for (var m = 0; m < data4.rows.length; m++) {
                                         if (data.rows[i][2] == data4.rows[m][2]) { // event date matches
                                             if (data.rows[i][8] == data4.rows[m][8]) { //IPC code matches
                                                 if (data.rows[i][9] == data4.rows[m][9]) { //provider code matches
-
                                                     variance = 0;
                                                     tableDataHtml = tableDataHtml + "<td><center>" + "Area mapping" + "</center></td>";
-                                                    tableDataHtml = tableDataHtml + "<td><center>" + data4.rows[j][9] + "</center></td>";
-                                                    tableDataHtml = tableDataHtml + "<td><center>" + data4.rows[j][10] + "</center></td>";
+                                                    tableDataHtml = tableDataHtml +
+                                                            "<td><center>" + data4.rows[j][9] + "</center></td>";
+                                                    tableDataHtml =
+                                                            tableDataHtml + "<td><center>" + data4.rows[j][10] + "</center></td>";
                                                     tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
                                                     break;
 
                                                 }
                                                 else {
                                                     variance = 100;
+                                                    tableDataHtml = tableDataHtml + "<td><center>" + "" +
+                                                            "</center></td>";
                                                     tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                                    tableDataHtml = tableDataHtml + "<td><center>" + data4.rows[j][10] + "</center></td>";
+                                                    tableDataHtml = tableDataHtml + "<td><center>" + data4.rows[j][10]
+                                                            + "</center></td>";
                                                     tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
                                                     break;
                                                 }
@@ -495,7 +586,7 @@
                                                 else {
                                                     variance = 100;
                                                     tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                                                    tableDataHtml = tableDataHtml + "<td><center>" + "" + " </center> </td>";
                                                     tableDataHtml = tableDataHtml + "<td><center>" + data5.rows[j][10] + "</center></td>";
                                                     tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
                                                     break;
@@ -503,28 +594,299 @@
 
                                             }
                                             else {
-                                                variance = 100;
+                                                variance =
+
+
+                                                        100;
                                                 tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
                                                 tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
-                                                tableDataHtml = tableDataHtml + "<td><center>" + data5.rows[j][10] + "</center></td>";
-                                                tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td ><center>" + data5.rows[j][10] + "</center></td>";
+                                                tableDataHtml = tableDataHtml + "<td><center>" + variance + "</center></td >";
                                                 break;
                                             }
                                         }
                                     }
 
-                        completeRow(index, data
-                        );
-                    }
-                });
+                        completeRow(index, data);
+                                } //IPC workplan
+                                $.get("../api/analytics/events/query/dmTPwDcAsTX.json?stage="+ stage1+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+
+                                        "&dimension=RsuC8i6NWFF&dimension=N5ff3MhWQ1J&dimension=Ib3dxl4YfNZ&displayProperty=NAME&desc=EVENTDATE", function(data) {
+                              //OM
+                                $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage=" + stage2 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit +
+                                        "&dimension=zNq2hXkOTga&dimension=sBD5FEalBsU&dimension=MCJaNkHvR4k&displayProperty=NAME&desc=EVENTDATE", function (json1) {
+
+
+                                    populateData_stage2(0, json1);
+
+                                    function completeRow_stage2(index,json1) {
+
+                                        tableDataHtml1 = "<tr>" + tableDataHtml1 + "</tr>";
+
+                                        populateData_stage2(index + 1, json1);
+
+                                    }
+
+                                    function populateData_stage2(index, json1) {
+                                        if (index == json1.rows.length) {
+                                            def_stage2.resolve("");
+                                            return
+                                        }
+                                        var i = index;
+
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + (data.rows.length + i + 1) + "</center></td>";
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][2].substring(0, 10) + "</center></td>"; // event date
+                                        //tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][5] + "</center></td>"; //ou
+
+
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][8] + "</center></td>"; //ipc code
+
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + "" + "</center></td>";//
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + "" + "</center></td>";//
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + "orientation meeting" + "</center></td>";//
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][9] + "</center></td>";//
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][10] + "</center></td>";//
+                                        for(j=0;j<data.rows.length;j++){
+
+
+                                            if((data.rows[j][2] == json1.rows[i][2])&&(data.rows[j][8] == json1.rows[i][8])&&(data.rows[j][9] == json1.rows[i][9])) {
+                                                variance = 0;
+                                            }
+                                            else{
+                                                variance =100;
+                                            }
+                                        }
+
+                                        tableDataHtml1 = tableDataHtml1 + "<td><center>" + variance + "</center></td>";//variance
+
+                                        completeRow_stage2(index, json1);
+
+
+                                    }
+                                    $.get("../api/analytics/events/query/dmTPwDcAsTX.json?stage="+ stage1+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+
+                                            "&dimension=RsuC8i6NWFF&dimension=N5ff3MhWQ1J&dimension=Ib3dxl4YfNZ&displayProperty=NAME&desc=EVENTDATE", function(data) {
+                                        //NM
+                                        $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage=" + stage3 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit + "&dimension=zNq2hXkOTga&dimension=sBD5FEalBsU&dimension=MCJaNkHvR4k&displayProperty=NAME&desc=EVENTDATE", function (json2) {
+
+                                            populateData_stage3(0, json2);
+
+                                            function completeRow_stage3(index, json2) {
+
+                                                tableDataHtml2 = "<tr>" + tableDataHtml2 + "</tr>";
+
+                                                populateData_stage3(index + 1, json2);
+
+                                            }
+
+                                            function populateData_stage3(index, json2) {
+                                                if (index == json2.rows.length) {
+                                                    def_stage3.resolve("");
+                                                    return
+                                                }
+                                                var i = index;
+
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + (data.rows.length+json1.rows.length + i + 1) + "</center></td>";
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + json2.rows[i][2].substring(0, 10) + "</center></td>"; // event date
+                                                //tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][5] + "</center></td>"; //ou
+
+
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + json2.rows[i][8] + "</center></td>"; //ipc code
+
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + "" + "</center></td>";//
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + "" + "</center></td>";//
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + "Neighbourhood meeting" + "</center></td>";//
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + json2.rows[i][9] + "</center></td>";//
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + json2.rows[i][10] + "</center></td>";//
+                                                for(j=0;j<data.rows.length;j++){
+
+
+                                                    if((data.rows[j][2] == json2.rows[i][2])&&(data.rows[j][8] == json2.rows[i][8])&&(data.rows[j][9] == json2.rows[i][9])) {
+                                                        variance = 0;
+                                                    }
+                                                    else{
+                                                        variance =100;
+                                                    }
+                                                }
+
+
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + variance + "</center></td>";//variance
+
+                                                completeRow_stage3(index, json2);
+
+
+                                            }
+
+                                            $.get("../api/analytics/events/query/dmTPwDcAsTX.json?stage=" + stage1 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit +
+                                                    "&dimension=RsuC8i6NWFF&dimension=N5ff3MhWQ1J&dimension=Ib3dxl4YfNZ&displayProperty=NAME&desc=EVENTDATE", function (data) {
+                                                //HH
+                                                $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage=" + stage4 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit + "&dimension=zNq2hXkOTga&dimension=sBD5FEalBsU&dimension=MCJaNkHvR4k&displayProperty=NAME&desc=EVENTDATE", function (json3) {
+
+                                                    populateData_stage4(0, json3);
+
+                                                    function completeRow_stage4(index, json3) {
+
+                                                        tableDataHtml3 = "<tr>" + tableDataHtml3 + "</tr>";
+
+                                                        populateData_stage4(index + 1, json3);
+
+                                                    }
+
+                                                    function populateData_stage4(index, json3) {
+                                                        if (index == json3.rows.length) {
+                                                            def_stage4.resolve("");
+                                                            return
+                                                        }
+                                                        var i = index;
+
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + (data.rows.length+json1.rows.length+json2.rows.length + i + 1) + "</center></td>";
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + json3.rows[i][2].substring(0, 10) + "</center></td>"; // event date
+                                                        //tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][5] + "</center></td>"; //ou
+
+
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + json3.rows[i][8] + "</center></td>"; //ipc code
+
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + "" + "</center></td>";//
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + "" + "</center></td>";//
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + "Household visits" + "</center></td>";//
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + json3.rows[i][9] + "</center></td>";//
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + json3.rows[i][10] + "</center></td>";//
+                                                        for(j=0;j<data.rows.length;j++){
+
+
+                                                            if((data.rows[j][2] == json3.rows[i][2])&&(data.rows[j][8] == json3.rows[i][8])) {
+                                                                variance = 0;
+                                                            }
+                                                            else{
+                                                                variance =100;
+                                                            }
+                                                        }
+                                                        tableDataHtml3 = tableDataHtml3 + "<td><center>" + variance + "</center></td>";//variance
+
+                                                        completeRow_stage4(index, json3);
+
+
+                                                    }
+                                                    $.get("../api/analytics/events/query/dmTPwDcAsTX.json?stage=" + stage1 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit +
+                                                            "&dimension=RsuC8i6NWFF&dimension=N5ff3MhWQ1J&dimension=Ib3dxl4YfNZ&displayProperty=NAME&desc=EVENTDATE", function (data) {
+                                                        //AM
+                                                        $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage=" + stage5 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit + "&dimension=zNq2hXkOTga&dimension=sBD5FEalBsU&dimension=MCJaNkHvR4k&displayProperty=NAME&desc=EVENTDATE", function (json4) {
+
+                                                            populateData_stage5(0, json4);
+
+                                                            function completeRow_stage5(index, json4) {
+
+                                                                tableDataHtml4 = "<tr>" + tableDataHtml4 + "</tr>";
+
+                                                                populateData_stage5(index + 1, json4);
+
+                                                            }
+
+                                                            function populateData_stage5(index, json4) {
+                                                                if (index == json4.rows.length) {
+                                                                    def_stage5.resolve("");
+                                                                    return
+                                                                }
+                                                                var i = index;
+
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + (data.rows.length+json1.rows.length+json2.rows.length+json3.rows.length + i + 1) + "</center></td>";
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + json4.rows[i][2].substring(0, 10) + "</center></td>"; // event date
+                                                                //tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][5] + "</center></td>"; //ou
+
+
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + json4.rows[i][8] + "</center></td>"; //ipc code
+
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + "" + "</center></td>";//
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + "" + "</center></td>";//
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + "Area Mapping" + "</center></td>";//
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + json4.rows[i][9] + "</center></td>";//
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + json4.rows[i][10] + "</center></td>";//
+                                                                for(j=0;j<data.rows.length;j++){
+
+
+                                                                    if((data.rows[j][2] == json4.rows[i][2])&&(data.rows[j][8] == json4.rows[i][8])&&(data.rows[j][9] == json4.rows[i][9])) {
+                                                                        variance = 0;
+                                                                    }
+                                                                    else{
+                                                                        variance =100;
+                                                                    }
+                                                                }
+                                                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + variance + "</center></td>";//variance
+
+                                                                completeRow_stage5(index, json4);
+
+
+                                                            }
+
+                                                                    $.get("../api/analytics/events/query/dmTPwDcAsTX.json?stage=" + stage1 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit +
+                                                                            "&dimension=RsuC8i6NWFF&dimension=N5ff3MhWQ1J&dimension=Ib3dxl4YfNZ&displayProperty=NAME&desc=EVENTDATE", function (data) {
+                                                                        //FV
+                                                                        $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage=" + stage6 + "&startDate=" + startDate + "&endDate=" + endDate + "&dimension=ou:" + orgnUnit + "&dimension=zNq2hXkOTga&dimension=sBD5FEalBsU&dimension=MCJaNkHvR4k&displayProperty=NAME&desc=EVENTDATE", function (json6) {
+
+                                                                            populateData_stage6(0, json6);
+
+                                                                            function completeRow_stage6(index, json6) {
+
+                                                                                tableDataHtml5 = "<tr>" + tableDataHtml5 + "</tr>";
+
+                                                                                populateData_stage6(index + 1, json6);
+
+                                                                            }
+
+                                                                            function populateData_stage6(index, json6) {
+                                                                                if (index == json6.rows.length) {
+                                                                                    def_stage6.resolve("");
+                                                                                    return
+                                                                                }
+                                                                                var i = index;
+
+                                                                                tableDataHtml5 = tableDataHtml5 + "<td><center>" + (data.rows.length+json1.rows.length+json2.rows.length+json3.rows.length+json4.rows.length+ i + 1) + "</center></td>";
+                                                                                tableDataHtml5 = tableDataHtml5 + "<td><center>" + json6.rows[i][2].substring(0, 10) + "</center></td>"; // event date
+                                                                                //tableDataHtml1 = tableDataHtml1 + "<td><center>" + json1.rows[i][5] + "</center></td>"; //ou
+
+
+                                                                                tableDataHtml5= tableDataHtml5 + "<td><center>" + json6.rows[i][8] + "</center></td>"; //ipc code
+
+                                                                                tableDataHtml5 = tableDataHtml5 + "<td><center>" + "" + "</center></td>";//
+                                                                                tableDataHtml5 = tableDataHtml5 + "<td><center>" + "" + "</center></td>";//
+                                                                                tableDataHtml5 = tableDataHtml5 + "<td><center>" + "Follow-up visits" + "</center></td>";//
+                                                                                tableDataHtml5 = tableDataHtml5 + "<td><center>" + json6.rows[i][9] + "</center></td>";//
+                                                                                tableDataHtml5 = tableDataHtml5 + "<td><center>" + json6.rows[i][10] + "</center></td>";//
+                                                                                for(j=0;j<data.rows.length;j++){
+
+
+                                                                                    if((data.rows[j][2] == json6.rows[i][2])&&(data.rows[j][8] == json6.rows[i][8])) {
+                                                                                        variance = 0;
+                                                                                    }
+                                                                                    else{
+                                                                                        variance =100;
+                                                                                    }
+                                                                                }
+
+                                                                                tableDataHtml5 = tableDataHtml5 + "<td><center>" + variance + "</center></td>";//variance
+
+                                                                                completeRow_stage6(index, json6);
+
+
+                                                                            }
+
+                                                                       // });
+                                                                   // });
+                                                        });
+                                                    });
+                                                });
+                                            });
+                                        });
+                                    });
+                                });
+                                });
+                                });
 
             });
         });
                 });
-                });
+                });   });   });
 });
-        $.when(def_stage1).done(function(){
-            $('#datavalue1').append(tableDataHtml);
+        $.when(def_stage1,def_stage2,def_stage3,def_stage4,def_stage5,def_stage6).done(function(){
+            $('#datavalue1').append(tableDataHtml,tableDataHtml1,tableDataHtml2,tableDataHtml3,tableDataHtml4,tableDataHtml5);
 
         });
 
@@ -535,174 +897,12 @@
     }
 
 
-    function loadReport() {
-        var htmlReport = "";
-        var selYear = gotPeriod.substring(0, 4);
-        var selMonth = gotPeriod.substring(4, 6);
 
-        //console.log( jsonData1 );
-        $("#" + showingTable + " > thead").html("");
 
-        htmlReport += "<thead><tr bgcolor='#F2DDDC' align='center' height='44'>";
-        // htmlReport += "<td>OrgUnit</td>";
-        $.each(tableDX, function () {
-            htmlReport += "<td>" + this.dxName + "</td>;";
-        });
-        htmlReport += "</tr></thead>";
-
-        $("#" + showingTable + " > tbody").html("");
-        htmlReport += "<tbody>";
-        $.each(orgUnitChildren, function (index1, ou) {
-            htmlReport += "<tr>";
-            htmlReport += "<td align='left'style='padding-left:5px'>" + ou.name + "</td>";
-            $.each(tableDX, function (index2, de) {
-                var temp = getCellValue(jsonData1, de.dxId, ou.id, periodsStr);
-                htmlReport += "<td align='center'>" + temp + "</td>";
-            });
-            htmlReport += "</tr>";
-        });
-        htmlReport += "</tbody>";
-
-        $("#" + showingTable).append(htmlReport);
-        hideLoad();
-    }
-
-    function getCellValue(json, de, ou, periodsStr) {
-        var result = 0;
-        for (var i = 0; i < json.rows.length; i++) {
-            //console.log( json.rows[i][0] + " : " + json.rows[i][1] + " : " + json.rows[i][2] + " : " + json.rows[i][3] );
-            //console.log( de + " : " + ou + " : " + coc );
-            //console.log( "********************************************" );
-            if (json.rows[i][0] == de && json.rows[i][2] == periodsStr && json.rows[i][1] == ou && json.rows[i][3] != null) {
-                result = json.rows[i][3];
-            }
-        }
-        return parseInt(result);
-    }
 
 </script>
 
 
-<!-- download script ------------------------------------------------------
-		--------------------------------------------------------------------------
-		-------------------------------------------------------------------------------------- -->
-<script type="text/javascript">
-    var tablesToExcel = (function () {
-        var uri = 'data:application/vnd.ms-excel;base64,', tmplWorkbookXML = '<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' + '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>ThaiND</Author><Created>{created}</Created></DocumentProperties>' + '<Styles><Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Horizontal="Center" ss:WrapText="1"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders><Font/><Interior /><NumberFormat /><Protection /></Style><Style ss:ID="s21"><Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style> <Style ss:ID="s22"><Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style><Style ss:ID="s64"> <Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center" ss:Indent="0" ss:Rotate="90"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /> </Style> </Styles>' + '{worksheets}</Workbook>', tmplWorksheetXML = '<Worksheet ss:Name="{nameWS}"><Table><Column ss:AutoFitWidth="0" ss:Width="100"/><Column ss:AutoFitWidth="0" ss:Width="150"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/>{rows}</Table></Worksheet>', tmplCellXML = '<Cell ss:StyleID="{sid}" ss:MergeAcross="{mrg}"><Data ss:Type="{dtype}">{data}</Data></Cell>', base64 = function (s) {
-                    return window.btoa(unescape(encodeURIComponent(s)))
-                }
-                , format = function (s, c) {
-                    return s.replace(/{(\w+)}/g, function (m, p) {
-                        return c[p];
-                    })
-                }
-
-        return function (tables, wsnames, wbname) {
-            var ctx = "";
-            var workbookXML = "";
-            var worksheetsXML = "";
-            var rowsXML = "";
-
-            for (var i = 0; i < tables.length; i++) {
-
-                if (!tables[i].nodeType)
-                    tables[i] = document.getElementById(tables[i]);
-
-                for (var j = 0; j < tables[i].rows.length; j++) {
-                    rowsXML += '<Row>'
-                    for (var k = 0; k < tables[i].rows[j].cells.length; k++) {
-
-                        var cols = tables[i].rows[j].cells[k].getAttribute("colspan");
-                        var rws = tables[i].rows[j].cells[k].getAttribute("rowspan");
-                        var styl = tables[i].rows[j].cells[k].getAttribute("bgcolor");
-                        var styl2 = tables[i].rows[j].getAttribute("bgcolor");
-                        var cls = tables[i].rows[j].cells[k].getAttribute("class");
-
-                        var dataType = 'String';
-                        var dataValue = tables[i].rows[j].cells[k].innerHTML;
-                        var typeD = "";
-                        var parsed = parseInt(dataValue);
-
-                        if (parsed == dataValue) {
-                            typeD = "Number";
-                        }
-                        else {
-                            typeD = "String";
-                        }
-
-
-                        if (styl2) {
-                            if (cols) {
-                                if (cls == "aso") {
-                                    ctx = {data: dataValue, mrg: cols - 1, sid: "s64", dtype: typeD};
-                                    rowsXML += format(tmplCellXML, ctx);
-                                }
-                                else {
-                                    ctx = {data: dataValue, mrg: cols - 1, sid: "s22", dtype: typeD};
-                                    rowsXML += format(tmplCellXML, ctx);
-                                }
-                            }
-
-                            else {
-                                if (cls == "aso") {
-                                    ctx = {data: dataValue, mrg: 0, sid: "s64", dtype: typeD};
-                                    rowsXML += format(tmplCellXML, ctx);
-                                }
-                                else {
-                                    ctx = {data: dataValue, mrg: 0, sid: "s22", dtype: typeD};
-                                    rowsXML += format(tmplCellXML, ctx);
-                                }
-                            }
-                        }
-
-                        else if (styl) {
-                            if (cols) {
-                                ctx = {data: dataValue, mrg: cols - 1, sid: "s21", dtype: typeD};
-                                rowsXML += format(tmplCellXML, ctx);
-                            }
-
-                            else {
-                                ctx = {data: dataValue, mrg: 0, sid: "s21", dtype: typeD};
-                                rowsXML += format(tmplCellXML, ctx);
-                            }
-                        }
-
-                        else {
-                            if (cols) {
-                                ctx = {data: dataValue, mrg: cols - 1, sid: "Default", dtype: typeD};
-                                rowsXML += format(tmplCellXML, ctx);
-                            }
-
-                            else {
-                                ctx = {data: dataValue, mrg: 0, sid: "Default", dtype: typeD};
-                                rowsXML += format(tmplCellXML, ctx);
-                            }
-
-                        }
-
-                    }
-                    rowsXML += '</Row>'
-                }
-                ctx = {rows: rowsXML, nameWS: wsnames[i] || 'Sheet' + i};
-                worksheetsXML += format(tmplWorksheetXML, ctx);
-                rowsXML = "";
-            }
-
-            ctx = {created: (new Date()).getTime(), worksheets: worksheetsXML};
-            workbookXML = format(tmplWorkbookXML, ctx);
-
-            //console.log(workbookXML);
-
-            var link = document.createElement("A");
-            link.href = uri + base64(workbookXML);
-            link.download = wbname || 'Workbook.xls';
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-    })();
-</script>
 <script type="text/javascript">
     function printContent(el) {
         var restorepage = document.body.innerHTML;
@@ -796,6 +996,10 @@
         <td><input type="button" onClick="loadDataX()" value="go" style="width:30px"/></td>
     </tr>
 </table>
+<!--<select id="workerdropdown" style=" margin-left:10%">
+    <option selected value="base">Please Select Worker</option>
+
+</select>-->
 </br></br>
 </br></br>
 
