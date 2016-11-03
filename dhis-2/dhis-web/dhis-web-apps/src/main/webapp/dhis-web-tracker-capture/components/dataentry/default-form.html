@@ -77,6 +77,7 @@
                         </div>
                     </div>
                     <div ng-if="!prStDe.dataElement.optionSetValue" ng-switch="prStDe.dataElement.valueType">
+
                         <div ng-switch-when="NUMBER">
                             <div class="hideInPrint">
                                 <input type="number"
@@ -185,6 +186,11 @@
                             </div>
                         </div>
                         <div ng-switch-when="TEXT">
+                            <div ng-if="">
+                                <select class="form-control margin-base-vertical input-small" style="width:100%"  ng-model="currentEvent[prStDe.dataElement.id]"
+                                        ng-options="oug.id as oug.name for oug in orgUnitGroups">
+                                </select>
+                            </div>
                             <div class="hideInPrint">
                                 <input type="text"
                                        ng-class="getInputNotifcationClass(prStDe.dataElement.id,false, currentEvent)"

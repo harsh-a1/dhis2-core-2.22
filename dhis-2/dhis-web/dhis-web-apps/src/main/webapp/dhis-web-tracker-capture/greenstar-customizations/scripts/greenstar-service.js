@@ -71,6 +71,20 @@ trackerCapture
                     return response.data;
                 });
                 return promise;
+            },
+            getOrgUnitGroups : function(){
+                var promise = $http.get('../api/organisationUnitGroups?fields=id,name&paging=false').then(function (response) {
+                    debugger
+                    return response.organisationUnitGroups;
+                });
+                return promise;
+            },
+            getDes : function(){
+                var promise = $http.get('../api/dataElements?fields=id,attributeValues&paging=false').then(function (response) {
+                    debugger
+                    return response;
+                });
+                return promise;
             }
         }
     })

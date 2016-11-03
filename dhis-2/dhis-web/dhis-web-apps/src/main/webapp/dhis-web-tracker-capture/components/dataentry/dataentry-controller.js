@@ -28,6 +28,17 @@ trackerCapture.controller('DataEntryController',
                 EventCreationService,
                 MetaDataFactory,
                 $q,$location) {
+
+
+            AjaxCalls.getOrgUnitGroups().then(function(ougs){
+                $scope.orgUnitGroups = ougs;
+            });
+
+            AjaxCalls.getDes().then(function(des){
+                $scope.deMetaAttrMap = des;
+                debugger
+            });
+
     $scope.printForm = false;
     $scope.printEmptyForm = false;
     $scope.eventPageSize = 4;
