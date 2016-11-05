@@ -1,7 +1,7 @@
 /* global angular, trackerCapture */
 
 trackerCapture.controller('DataEntryController',
-        function ($rootScope,associationService,AjaxCalls,
+        function ($rootScope,associationService,AjaxCalls,utilityService,
                 $scope,
                 $modal,
                 $filter,
@@ -29,14 +29,26 @@ trackerCapture.controller('DataEntryController',
                 MetaDataFactory,
                 $q,$location) {
 
+            const DeMetaAttrCode = "orgUnitGroupSwitch";
 
-            AjaxCalls.getOrgUnitGroups().then(function(ougs){
-                $scope.orgUnitGroups = ougs;
+            AjaxCalls.getOrgUnitGroups().then(function(data){
+                $scope.orgUnitGroups = data.organisationUnitGroups;
             });
 
             AjaxCalls.getDes().then(function(des){
                 $scope.deMetaAttrMap = des;
-                debugger
+
+                for (var key in des.dataElements){
+
+                    var value = utilityService.extractMetaAttributeValue(des.dataElements[key].attributeValues,DeMetaAttrCode);
+                    $scope.deMetaAttrMap[des.dataElements[key].id] = des.dataElements[key];
+
+                    if (value){
+                        $scope.deMetaAttrMap[des.dataElements[key].id][DeMetaAttrCode] = value;
+                    }
+
+                }
+
             });
 
     $scope.printForm = false;

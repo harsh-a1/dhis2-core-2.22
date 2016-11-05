@@ -186,12 +186,17 @@
                             </div>
                         </div>
                         <div ng-switch-when="TEXT">
-                            <div ng-if="">
-                                <select class="form-control margin-base-vertical input-small" style="width:100%"  ng-model="currentEvent[prStDe.dataElement.id]"
-                                        ng-options="oug.id as oug.name for oug in orgUnitGroups">
-                                </select>
-                            </div>
+
                             <div class="hideInPrint">
+                                <div ng-if="deMetaAttrMap[prStDe.dataElement.id].orgUnitGroupSwitch">
+                                    <select  ng-class="getInputNotifcationClass(prStDe.dataElement.id,false, currentEvent)"
+                                             class="form-control input-with-audit"
+                                             ng-model="currentEvent[prStDe.dataElement.id]"
+                                            ng-options="oug.id as oug.name for oug in orgUnitGroups"
+                                             ng-blur="saveDatavalue(prStDe, innerForm.foo)">
+                                    </select>
+                                </div>
+                                <div ng-if="!deMetaAttrMap[prStDe.dataElement.id].orgUnitGroupSwitch">
                                 <input type="text"
                                        ng-class="getInputNotifcationClass(prStDe.dataElement.id,false, currentEvent)"
                                        class="form-control input-with-audit"
@@ -200,6 +205,7 @@
                                        ng-disabled="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed || assignedFields[currentEvent.event][prStDe.dataElement.id]"
                                        ng-blur="saveDatavalue(prStDe, innerForm.foo)"
                                        name="foo"/>
+                                </div>
                                 <d2-audit dataelement-id="{{prStDe.dataElement.id}}" dataelement-name="{{prStDe.dataElement.name}}" current-event="{{currentEvent.event}}"></d2-audit>
                             </div>
                             <div class="not-for-screen">

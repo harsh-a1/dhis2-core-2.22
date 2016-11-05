@@ -74,15 +74,15 @@ trackerCapture
             },
             getOrgUnitGroups : function(){
                 var promise = $http.get('../api/organisationUnitGroups?fields=id,name&paging=false').then(function (response) {
-                    debugger
-                    return response.organisationUnitGroups;
+
+                    return response.data;
                 });
                 return promise;
             },
             getDes : function(){
-                var promise = $http.get('../api/dataElements?fields=id,attributeValues&paging=false').then(function (response) {
-                    debugger
-                    return response;
+                var promise = $http.get('../api/dataElements?fields=id,attributeValues[attribute[id,code],value]&paging=false').then(function (response) {
+
+                    return response.data;
                 });
                 return promise;
             }
