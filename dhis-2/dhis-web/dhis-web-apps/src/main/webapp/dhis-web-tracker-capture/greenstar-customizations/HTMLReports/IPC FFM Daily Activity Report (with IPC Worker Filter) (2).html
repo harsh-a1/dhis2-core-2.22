@@ -1,0 +1,1393 @@
+<script type="text/javascript">
+
+    var periods = dhis2.report.periods;
+    var period = periods[0];
+    var orgUnit = dhis2.report.organisationUnit;
+    orgUnit.parent = dhis2.report.organisationUnitHierarchy[1];
+    var orgUnitChildren = dhis2.report.organisationUnitChildren;
+    var orgUnitUIDs = "";
+
+    var new_providerid ="L0bSL88vvdz";
+    var old_providerid= "ndf6du48Fy5";
+
+
+    var prgUID = "TbYUPaBChYR";
+var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
+    var tableDataHtml, tableDataHtml1, tableDataHtml2,tableDataHtml3,tableDataHtml4;
+    var stage1 ="mDwBhWDmLfr";
+    var stage2 ="hVVdocIy72g";
+    var stage3="OMHUToxZR03";
+    var stage4 = "k7gHjJ4LFOU";
+    var stage5 ="n2CFuvwUvnh";
+    var orgnUnit ="tZJsIdHAfKq";
+
+    if (jQuery.when.all === undefined) {
+        jQuery.when.all = function (deferreds) {
+            var deferred = new jQuery.Deferred();
+            $.when.apply(jQuery, deferreds).then(
+                    function () {
+                        deferred.resolve(Array.prototype.slice.call(arguments));
+                    },
+                    function () {
+                        deferred.fail(Array.prototype.slice.call(arguments));
+                    });
+
+            return deferred;
+        }
+    }
+
+
+    var tableDX = [
+
+
+        { dxName: "PK RH FP-Clients followed-up", dxId: "NoGwMfqdSOY", cocId: "" },
+        { dxName: "PK RH FP-IPC FFM first client MWRA ID", dxId: "qbK1eGEgVD4", cocId: "" },
+        { dxName: "PK RH FP-IPC FFM referral tokens issued", dxId: "gBdx1XMCySe", cocId: "" },
+        { dxName: "PK RH FP IPC FFM last client MWRA ID", dxId: "vKpDeWYKhHk", cocId: "" },
+        { dxName: "PK RH FP-Orientation meeting participants", dxId: "Pusk3tS9CEP", cocId: "" },
+        { dxName: "PK RH FP-Neighbourhood meeting participants", dxId: "dvLvzUaJeQh", cocId: "" },
+        { dxName: "PK RH FP-IPC FFM clients visited", dxId: "nUqWTyxWCZs", cocId: "" }
+    ];
+
+
+    var deUIDs = "";
+
+    var url = window.location.href;
+    var params = url.split('=');
+    var gotPeriod = params[2];
+    var showingTable = "datavalue1";
+
+    jQuery(document).ready(function () {
+
+        $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&trackedEntity=lLKXYUBAAMy", function (json3) {
+
+
+            $.each(json3.trackedEntityInstances, function (index, item) {
+                $.each(item.attributes, function (index1, item1) {
+
+                    if (item1.code == "Firstname") {
+                        $('#workerdropdown').append(
+                                $('<option></option>').val(item.trackedEntityInstance).html(item1.value).text(item1.value)
+                        );
+                    }
+                });
+            });
+
+        });
+        $("#workerdropdown").change(function () {
+            worker = $(this).find("option:selected").text();
+
+            workertracked = $(this).find("option:selected").val();
+
+            var Table = document.getElementById("datavalue1");
+            Table.innerHTML = "";
+
+            def_stage1 = $.Deferred();
+            def_stage2 = $.Deferred();
+            def_stage3 = $.Deferred();
+            def_stage4 = $.Deferred();
+            def_stage5 = $.Deferred();
+
+            var a = document.getElementById('datepicker').value;
+            startDate = a.split("/").reverse().join("-");
+
+
+            var b = document.getElementById('datepicker1').value;
+            endDate = b.split("/").reverse().join("-");
+
+            console.log(startDate);
+            console.log(endDate);
+
+            var periodStr = a + " " + "to" + " " + b;
+            console.log(periodStr);
+            var events = [];
+            document.getElementById('selectedOUName').innerHTML = orgUnit.name;
+            document.getElementById('period').innerHTML = periodStr;
+
+            // prepare table header
+            var headerHtml = "<thead  ><tr bgcolor='#F2DDDC' ><th  rowspan='2' ><center>S No.</center></th>" +
+                            "<th rowspan='2'><center>Date</center></th>" +
+                            "<th  rowspan='2'><center>IPC Workers Name</center></th>" +
+                            "<th rowspan='2'><center>IPC Code</center></th>" +
+                            "<th rowspan='2'><center>Gender</center></th>" +
+                            "<th rowspan='2'><center>Phone No.</center></th>" +
+                            "<th rowspan='2'><center>IPC Worker Activity Name</center></th>" +
+                            "<th colspan='7'><center>Activity Details</center></th>"+
+                            "<th rowspan='2'><center>Provider Code</center></th>"+
+                            "<th rowspan='2'  bgcolor='#F2DDDC'><center>Provider Name</center></th></tr>"+
+
+                            "<tr><th colspan='1' bgcolor='#F2DDDC'>Clients Followed-Up</th>"+
+                            "<th colspan='1' bgcolor='#F2DDDC'>First Client MWRA ID</th>"+
+                            "<th colspan='1' bgcolor='#F2DDDC'>Referral Tokens Issued</th>"+
+                            "<th colspan='1' bgcolor='#F2DDDC'>Last Client MWRA ID</th>"+
+                            "<th colspan='1' bgcolor='#F2DDDC'>Orientation meeting participants</th>"+
+                            "<th colspan='1' bgcolor='#F2DDDC'>Neighbourhood meeting participants</th>"+
+                            "<th colspan='1' bgcolor='#F2DDDC'>Clients visited</th></tr>"
+
+
+                    ;
+
+            headerHtml = headerHtml + "</tr></thead>";
+            $('#datavalue1').html("");
+
+            $('#datavalue1').append(headerHtml);
+            //	tableDataHtml="";
+            tableDataHtml = "<tbody><tr>";
+
+
+            // data for neighbourhood meeting
+            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage1+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=sBD5FEalBsU&dimension=zNq2hXkOTga&dimension=ZBdTzQfOkOK&dimension=SxSh9297ihW&dimension=dvLvzUaJeQh&dimension=gBdx1XMCySe&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data){
+                // def_stage1 = $.Deferred();
+console.log("/api/analytics/events/query/TbYUPaBChYR.json?stage="+stage1+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=sBD5FEalBsU&dimension=zNq2hXkOTga&dimension=ZBdTzQfOkOK&dimension=SxSh9297ihW&dimension=dvLvzUaJeQh&dimension=gBdx1XMCySe&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE");
+                var ids;
+                // var dfd = jQuery.Deferred();
+                //call first stage
+                populateData(0,data);
+
+                function completeRow(index,data){
+                    tableDataHtml="<tr>"+tableDataHtml+"</tr>";
+                    populateData(index+1,data);
+
+                }
+                function populateData(index,data){
+                    if (index == data.rows.length){
+                        def_stage1.resolve("");
+                        return
+                    }
+                    var i = index;
+
+                 if (data.rows[i][8] == worker) {
+                           console.log("Success"+ worker);
+                        tableDataHtml = tableDataHtml + "<td><center>" + (i + 1) + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][2] + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][8] + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][10] + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][11] + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + ( (data.rows[i][12]) * (10 ^ 11)) + "</center></td>";
+
+                        tableDataHtml = tableDataHtml + "<td><center>" + data.metaData.names["mDwBhWDmLfr"] + "</center></td>";
+
+                        tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][13] + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][14] + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][9] + "</center></td>";
+}
+                        if (data.rows[i][9] == "") {
+
+                            tableDataHtml = tableDataHtml + "<td><center>" + "Provider code invalid" + "</center></td>";
+                            completeRow(index, data);
+                        }
+
+						
+                        else {
+       if (data.rows[i][8] == worker) {
+                            //for old_providerid : ndf6du48Fy5
+
+
+                            // for new provider id --L0bSL88vvdz
+                            $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data.rows[i][9], function (json3) {
+                               console.log("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data.rows[i][9]);
+                                if (json3.trackedEntityInstances.length == 0) {
+
+                                    tableDataHtml = tableDataHtml + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                    completeRow(index, data);
+
+                                }
+                                else {
+                                    for (var j = 0; j < json3.trackedEntityInstances[0].attributes.length; j++) {
+                                        if (json3.trackedEntityInstances[0].attributes[j].displayName == 'Name') {
+
+                                            tableDataHtml = tableDataHtml + "<td><center>" + json3.trackedEntityInstances[0].attributes[j].value + "</center></td>";
+                                            completeRow(index, data);
+
+                                        }
+                                    }
+
+                                }
+
+                                // dfd.resolve();
+                            });}
+							
+							else
+							{
+							 completeRow(index, data);
+							}
+
+                        }
+
+
+                }
+
+
+// data for follow up visits
+                $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage2+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=NoGwMfqdSOY&dimension=gBdx1XMCySe&displayProperty=NAME&desc=EVENTDATE",function(data1){
+                    //    def_stage2 = $.Deferred();
+                    headerHtml = headerHtml + "</tr></thead>";
+                    // $('#datavalue1').html("");
+                    // $('#datavalue1').append(headerHtml);
+                    tableDataHtml1 = "<tbody>";
+
+                    var ids;
+                    for (var i = 0; i < data1.rows.length; i++) {
+                        if (data1.rows[i][8] == worker) {
+                            console.log("Success2" + worker);
+                            //	if( data1.rows[i][9]  == 'Female'){
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + (data.rows.length + i + 1) + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][2] + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][8] + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][10] + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][9] + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + ((data1.rows[i][11]) * (10 ^ 11)) + "</center></td>";
+
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.metaData.names["hVVdocIy72g"] + "</center></td>";
+
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][14] + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][12] + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][15] + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][13] + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + 'NA' + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + 'NA' + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + 'NA' + "</center></td>";
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + 'NA' + "</center></td>";
+
+                            tableDataHtml1 = tableDataHtml1 + "<td><center>" + "Provider code invalid" + "</center></td>";
+
+
+                            tableDataHtml1 = "<tr>" + tableDataHtml1 + "</tr>";
+
+                            //	} // end if
+
+                            /*	else if(data1.rows[i][9]  == 'Male'){
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + (data.rows.length+i+1) + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][2] + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][8] + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +data1.rows[i][10] + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +data1.rows[i][9] + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +((data1.rows[i][11])*(10^11)) + "</center></td>";
+
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +  data1.metaData.names["hVVdocIy72g"] + "</center></td>";
+
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][14] + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][12] + "</center></td>";
+                         tableDataHtml1= tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][15] + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][13]  + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +  'NA'+ "</center></td>";
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+
+                         tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
+
+                         tableDataHtml1="<tr>"+tableDataHtml1+"</tr>";
+
+                         }*/
+//                    }
+//
+//
+//                    else{
+
+                            //                            alert("Filtered Out Worker: on Stage  2 "+ worker);
+//                    }
+                        }
+                    tableDataHtml1 =
+                            tableDataHtml1 + "</tbody>";
+
+                    def_stage2.resolve("");
+}
+                    // orientation meeting data
+
+                    $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage3+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=Pusk3tS9CEP&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data2){
+                        //    def_stage3 = $.Deferred();
+                        headerHtml = headerHtml + "</tr></thead>";
+                        //  $('#datavalue1').html("");
+                        //  $('#datavalue1').append(headerHtml);
+                        tableDataHtml2 = "<tbody>";
+
+                        var ids;
+                        populateData_stage3(0,data2);
+                        function completeRow_stage3(index,data){
+                            tableDataHtml2 = "<tr>" + tableDataHtml2 + "</tr>";
+                            populateData_stage3(index+1,data);
+
+                        }
+                        function populateData_stage3(index,data){
+                            if (index == data.rows.length){
+
+                                def_stage3.resolve("");
+                                return
+                            }
+                            var i= index;
+
+                            //   for (var i = 0; i < data2.rows.length; i++) {
+//
+                           if (data2.rows[i][8] == worker) {
+                                console.log("Success3"+ worker);
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + (data.rows.length+i+data1.rows.length-1) + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][2] + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][8] + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][10] + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" +data2.rows[i][9] + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" +((data2.rows[i][11])*(10^11)) + "</center></td>";
+
+
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.metaData.names["OMHUToxZR03"] + "</center></td>";
+
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2+ "<td><center>" + data2.rows[i][12] + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" +  'NA'+ "</center></td>";
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" +data2.rows[i][13] + "</center></td>";
+}
+                            if(data2.rows[i][13] =="") {
+
+                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                completeRow_stage3(index,data);
+
+                            }
+
+                            else{
+ if (data2.rows[i][8] == worker) {
+
+                                $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data2.rows[i][13], function (json21) {
+
+                                    if(json21.trackedEntityInstances.length ==0) {
+
+                                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                        completeRow_stage3(index,data);
+
+                                    }
+                                    else
+                                    {
+									
+                                        for (var j = 0; j < json21.trackedEntityInstances[0].attributes.length; j++)
+                                        {
+										 
+                                            if (json21.trackedEntityInstances[0].attributes[j].displayName == 'Name') {
+
+                                                tableDataHtml2 = tableDataHtml2 + "<td><center>" + json21.trackedEntityInstances[0].attributes[j].value + "</center></td>";
+                                                completeRow_stage3(index,data);
+                                            }
+											
+										
+										}
+										
+
+                                    }
+
+                                });}
+								else
+								{
+								
+								completeRow_stage3(index,data);
+								}
+
+                            }
+//                            }
+//                            else {
+//                                alert("Filtered Out Worker: on Stage  3 "+ worker);
+//                            }
+                        }
+                        // data for area mapping
+
+
+                        $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage4+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data3){
+                            //     def_stage4 = $.Deferred();
+                            headerHtml = headerHtml + "</tr></thead>";
+                            // $('#datavalue1').html("");
+                            // $('#datavalue1').append(headerHtml);
+                            tableDataHtml3 = "<tbody>";
+
+                            var ids;
+                            populateData_stage4(0,data3);
+                            function completeRow_stage4(index,data){
+                                tableDataHtml3 = "<tr>" + tableDataHtml3 + "</tr>";
+                                populateData_stage4(index+1,data);
+
+                            }
+                            function populateData_stage4(index,data) {
+                                if (index == data.rows.length) {
+
+                                    def_stage4.resolve("");
+                                    return
+                                }
+                                var i = index;
+
+                                // if(data3.rows[i][9] == 'Male'){
+                                if (data3.rows[i][8] == worker) {
+                                console.log("Success4" + worker);
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + (data.rows.length + data2.rows.length + i) + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][2] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][8] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][10] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][9] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'<center>" + ((data3.rows[i][11]) * (10 ^ 11)) + "</center></td>";
+
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.metaData.names["k7gHjJ4LFOU"] + "</center></td>";
+
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][12] + "</center></td>";
+}
+                                if (data.rows[i][12] == "") {
+
+                                    tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
+                                    completeRow_stage4(index, data);
+
+                                }
+
+                                else {
+								 if (data2.rows[i][8] == worker) {
+                                    $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data3.rows[i][12], function (json11) {
+
+                                        if (json11.trackedEntityInstances.length == 0) {
+
+                                            tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
+                                            completeRow_stage4(index, data);
+
+
+                                        }
+                                        else {
+                                            for (var j = 0; j < json11.trackedEntityInstances[0].attributes.length; j++) {
+                                                if (json11.trackedEntityInstances[0].attributes[j].displayName == 'Name') {
+
+                                                    tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + json11.trackedEntityInstances[0].attributes[j].value + "</center></td>";
+                                                    completeRow_stage4(index, data);
+
+                                                }
+                                            }
+
+                                        }
+                                    });}
+									else
+									{
+									      completeRow_stage4(index, data);
+									
+									}
+                                }
+
+//                                }
+                                //}// end if--male
+                   
+                            } // end function
+                            //  $('#datavalue1').append(tableDataHtml, tableDataHtml1, tableDataHtml2,tableDataHtml3);
+// data for house hold visits
+
+                            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage5+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=nUqWTyxWCZs&dimension=gBdx1XMCySe&displayProperty=NAME&desc=EVENTDATE", function(data4){
+                                headerHtml = headerHtml + "</tr></thead>";
+                                //  $('#datavalue1').html("");
+                                //  $('#datavalue1').append(headerHtml);
+                                tableDataHtml4 = "<tbody>";
+
+                                var ids;
+                                for (var i = 0; i < data4.rows.length; i++) {
+                                    if (data4.rows[i][8] == worker) {
+                                        console.log("Success5" + worker);
+                                        //	if (data4.rows[i][9] == 'Female')
+                                        //	{
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + (data.rows.length + data2.rows.length + data3.rows.length + i + data1.rows.length + 1) + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][2] + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][8] + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][10] + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][9] + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + ((data4.rows[i][11]) * (10 ^ 11)) + "</center></td>";
+
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.metaData.names["n2CFuvwUvnh"] + "</center></td>";
+
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][12] + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][15] + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][13] + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][14] + "</center></td>";
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
+
+                                        tableDataHtml4 = tableDataHtml4 + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                        tableDataHtml4 = "<tr>" + tableDataHtml4 + "</tr>";
+                                        //}
+
+
+                                        tableDataHtml4 = tableDataHtml4 + "</tbody>";
+                                        def_stage5.resolve("");
+                                    }
+                                    // $('#datavalue1').append(tableDataHtml, tableDataHtml1, tableDataHtml2,tableDataHtml3,tableDataHtml4);
+                                }
+                            });
+
+
+                        });
+
+                    });
+                });
+
+            });
+
+            $.when(def_stage1,def_stage2,def_stage3,def_stage4,def_stage5).done(function(){
+                $('#datavalue1').append(tableDataHtml, tableDataHtml1,tableDataHtml2,tableDataHtml3,tableDataHtml4);
+
+            });
+
+
+
+        });
+
+        //validateReport();
+        $(".hideInPrint").hide();
+        orgUnitChildren.sort(function (a, b) {
+            if (a.name < b.name)
+                return -1;
+            if (a.name > b.name)
+                return 1;
+            return 0;
+        });
+
+        $.each(tableDX, function () {
+            deUIDs += this.dxId + ";";
+        });
+
+        $.each(orgUnitChildren, function () {
+            orgUnitUIDs += this.id + ";";
+        });
+
+        //    loadDataX();
+        $("#datepicker").datepicker({dateFormat: "dd/mm/yy"});
+        $("#datepicker1").datepicker({dateFormat: "dd/mm/yy"});
+
+
+        $("#btnExport").click(function (e) {
+            window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#printing').html()));
+            e.preventDefault();
+        });
+
+    });
+
+
+    function hideLoad() {
+        document.getElementById("cover").style.display = "none";
+        document.getElementById("loads").style.display = "none";
+        document.getElementById("loading").style.display = "none";
+        document.getElementsByTagName("body")[0].style.overflow = "scroll";
+    }
+
+    function validateReport() {
+        $.get("../api/organisationUnitGroups/hdvIWjIWixd?filter=organisationUnits.id:eq:" + orgUnit.id, function (json) {
+
+            if (!json.name) {
+                alert("Selected Facility is not in Intervention OU Group");
+                window.history.back();
+            }
+            else {
+                loadData();
+            }
+        });
+    }
+
+
+    function getPeriod(pr) {
+        var year = pr.substring(0, 4);
+        var month = pr.substring(4, 6);
+        var strMonth = "";
+
+        if (month == "01" || month == "1")        strMonth = "January";
+        else if (month == "02" || month == "2")    strMonth = "February";
+        else if (month == "03" || month == "3")    strMonth = "March";
+        else if (month == "04" || month == "4")    strMonth = "April";
+        else if (month == "05" || month == "5")    strMonth = "May";
+        else if (month == "06" || month == "6")    strMonth = "June";
+        else if (month == "07" || month == "7")    strMonth = "July";
+        else if (month == "08" || month == "8")    strMonth = "August";
+        else if (month == "09" || month == "9")    strMonth = "September";
+        else if (month == "10")                strMonth = "October";
+        else if (month == "11")                strMonth = "November";
+        else if (month == "12")                strMonth = "December";
+
+        return strMonth + " " + year;
+    }
+
+    var periodArray = [];
+  //  var cYear = parseInt(gotPeriod.substring(0, 4));
+   // var cMonth = parseInt(gotPeriod.substring(4, 6));
+  //  var periodsStr = gotPeriod.substring(0, 4) + "" + gotPeriod.substring(4, 6);
+
+    var jsonData1;
+    var jsonData2;
+    var jsonData3;
+    var c = 0;
+
+    function loadData() {
+        document.getElementById('selectedOUName').innerHTML = orgUnit.name;
+        document.getElementById('period').innerHTML = getPeriod(gotPeriod);
+
+        //http://localhost:8090/dhis221/api/analytics.json?dimension=pe:THIS_MONTH&dimension=dx:fftwX6D3iuI;vMISOrzIDPL;Y3sftYIwjSx;Nr8JvumTkmZ;lO9hVUqHo9v;xi0iWC3fLH5;XWBvNBGaek0;xJbKdiq41l3&dimension=ou:Xyeh1Hkiz0i;IsDCrC4yKIB;VKvtcjd4XC3;R0DM4NKU4iX;gXg0zlcO1Xt;EjHkVXiw2tR;b0rHfpNxUUm;zUGO5Ho7Aqb&program=icAx8KDM1WT
+        var url = "../api/analytics.json?dimension=dx:" + deUIDs + "&dimension=ou:" + orgUnitUIDs + "&dimension=pe:" + periodsStr + "&program=" + prgUID;
+
+        console.log(url);
+        $.get(url, function (json) {
+
+
+            console.log("************************URL: " + url);
+
+            jsonData1 = json;
+            //console.log( jsonData1 );
+
+            loadReport();
+        });
+
+    }
+
+    function prepareIdToObjectMap(object, id) {
+        var map = [];
+        for (var i = 0; i < object.length; i++) {
+            map[object[i][id]] = object[i];
+        }
+        return map;
+    }
+
+    function loadDataX() {
+ //  
+  def_stage1 = $.Deferred();
+        def_stage2 = $.Deferred();
+        def_stage3 = $.Deferred();
+        def_stage4 = $.Deferred();
+        def_stage5 = $.Deferred();
+
+        var a = document.getElementById('datepicker').value;
+        startDate = a.split("/").reverse().join("-");
+
+
+        var b = document.getElementById('datepicker1').value;
+        endDate = b.split("/").reverse().join("-");
+
+        console.log(startDate);
+        console.log(endDate);
+
+        var periodStr = a + " " + "to" + " " + b;
+        console.log(periodStr);
+        var events = [];
+        document.getElementById('selectedOUName').innerHTML = orgUnit.name;
+        document.getElementById('period').innerHTML = periodStr;
+
+        // prepare table header
+        var headerHtml = "<thead  ><tr bgcolor='#F2DDDC' ><th  rowspan='2' ><center>S No.</center></th>" +
+                        "<th rowspan='2'><center>Date</center></th>" +
+                        "<th  rowspan='2'><center>IPC Workers Name</center></th>" +
+                        "<th rowspan='2'><center>IPC Code</center></th>" +
+                        "<th rowspan='2'><center>Gender</center></th>" +
+                        "<th rowspan='2'><center>Phone No.</center></th>" +
+                        "<th rowspan='2'><center>IPC Worker Activity Name</center></th>" +
+                        "<th colspan='7'><center>Activity Details</center></th>"+
+                        "<th rowspan='2'><center>Provider Code</center></th>"+
+                        "<th rowspan='2'  bgcolor='#F2DDDC'><center>Provider Name</center></th></tr>"+
+
+                        "<tr><th colspan='1' bgcolor='#F2DDDC'>Clients Followed-Up</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>First Client MWRA ID</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Referral Tokens Issued</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Last Client MWRA ID</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Orientation meeting participants</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Neighbourhood meeting participants</th>"+
+                        "<th colspan='1' bgcolor='#F2DDDC'>Clients visited</th></tr>"
+
+
+                ;
+
+        headerHtml = headerHtml + "</tr></thead>";
+        $('#datavalue1').html("");
+
+        $('#datavalue1').append(headerHtml);
+	//	tableDataHtml="";
+         tableDataHtml = "<tbody><tr>";
+   
+
+        // data for neighbourhood meeting
+        $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage1+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=sBD5FEalBsU&dimension=zNq2hXkOTga&dimension=ZBdTzQfOkOK&dimension=SxSh9297ihW&dimension=dvLvzUaJeQh&dimension=gBdx1XMCySe&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data){
+           // def_stage1 = $.Deferred();
+
+            var ids;
+           // var dfd = jQuery.Deferred();
+            //call first stage
+            populateData(0,data);
+
+            function completeRow(index,data){
+                tableDataHtml="<tr>"+tableDataHtml+"</tr>";
+                populateData(index+1,data);
+
+            }
+            function populateData(index,data){
+                if (index == data.rows.length){
+                    def_stage1.resolve("");
+                    return
+                }
+                var i = index;
+
+                    tableDataHtml = tableDataHtml + "<td><center>" + (i + 1) + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][2] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][8] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][10] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][11] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" +( (data.rows[i][12])*(10^11)) + "</center></td>";
+
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.metaData.names["mDwBhWDmLfr"] + "</center></td>";
+
+                    tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][13] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][14] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + 'NA' + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.rows[i][9] + "</center></td>";
+
+                    if(data.rows[i][9] =="") {
+
+                        tableDataHtml = tableDataHtml + "<td><center>" + "Provider code invalid" + "</center></td>";
+                        completeRow(index,data);
+                    }
+
+                    else{
+
+                   //for old_providerid : ndf6du48Fy5
+                  
+
+                          // for new provider id --L0bSL88vvdz
+                            $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data.rows[i][9], function (json3) {
+                            if(json3.trackedEntityInstances.length ==0) {
+
+                                tableDataHtml = tableDataHtml + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                completeRow(index,data);
+
+                            }
+                            else
+                            {
+                                for (var j = 0; j < json3.trackedEntityInstances[0].attributes.length; j++)
+                                {
+                                    if (json3.trackedEntityInstances[0].attributes[j].displayName == 'Name') {
+
+                                        tableDataHtml = tableDataHtml + "<td><center>" + json3.trackedEntityInstances[0].attributes[j].value + "</center></td>";
+                                        completeRow(index,data);
+
+                                    }
+                                }
+
+                            }
+
+                            // dfd.resolve();
+                        });
+
+                    }
+                  
+
+
+
+            }
+
+       
+// data for follow up visits
+            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage2+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=NoGwMfqdSOY&dimension=gBdx1XMCySe&displayProperty=NAME&desc=EVENTDATE",function(data1){
+            //    def_stage2 = $.Deferred();
+                headerHtml = headerHtml + "</tr></thead>";
+               // $('#datavalue1').html("");
+               // $('#datavalue1').append(headerHtml);
+                 tableDataHtml1 = "<tbody>";
+
+                var ids;
+                for (var i = 0; i < data1.rows.length; i++) {
+
+				if( data1.rows[i][9]  == 'Female'){
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + (data.rows.length+i+1) + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][2] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][8] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" +data1.rows[i][10] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" +data1.rows[i][9] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" +((data1.rows[i][11])*(10^11)) + "</center></td>";
+
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" +  data1.metaData.names["hVVdocIy72g"] + "</center></td>";
+
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][14] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][12] + "</center></td>";
+                    tableDataHtml1= tableDataHtml1 + "<td><center>" + data1.rows[i][15] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + data1.rows[i][13]  + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + 'NA' + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + 'NA' + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" +  'NA'+ "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td><center>" + 'NA' + "</center></td>";
+
+                   tableDataHtml1 = tableDataHtml1 + "<td><center>" + "Provider code invalid" + "</center></td>";
+				   
+
+                    tableDataHtml1="<tr>"+tableDataHtml1+"</tr>";
+                 
+					} // end if
+				/*	else if(data1.rows[i][9]  == 'Male'){
+					 tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + (data.rows.length+i+1) + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][2] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][8] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +data1.rows[i][10] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +data1.rows[i][9] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +((data1.rows[i][11])*(10^11)) + "</center></td>";
+
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +  data1.metaData.names["hVVdocIy72g"] + "</center></td>";
+
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][14] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][12] + "</center></td>";
+                    tableDataHtml1= tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][15] + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + data1.rows[i][13]  + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" +  'NA'+ "</center></td>";
+                    tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+
+                   tableDataHtml1 = tableDataHtml1 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
+
+                    tableDataHtml1="<tr>"+tableDataHtml1+"</tr>";
+                   
+					}*/
+                }// end for loop
+
+                tableDataHtml1 = tableDataHtml1 + "</tbody>";
+				
+                            def_stage2.resolve("");
+           
+
+// orientation meeting data
+             
+            $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage3+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=Pusk3tS9CEP&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data2){
+                //    def_stage3 = $.Deferred();
+                    headerHtml = headerHtml + "</tr></thead>";
+                  //  $('#datavalue1').html("");
+                  //  $('#datavalue1').append(headerHtml);
+                     tableDataHtml2 = "<tbody>";
+
+                    var ids;
+                    populateData_stage3(0,data2);
+                    function completeRow_stage3(index,data){
+                        tableDataHtml2 = "<tr>" + tableDataHtml2 + "</tr>";
+                        populateData_stage3(index+1,data);
+
+                    }
+                    function populateData_stage3(index,data){
+                        if (index == data.rows.length){
+
+                            def_stage3.resolve("");
+                            return
+                        }
+                        var i= index;
+
+                     //   for (var i = 0; i < data2.rows.length; i++) {
+
+
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + (data.rows.length+i+data1.rows.length-1) + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][2] + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][8] + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.rows[i][10] + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" +data2.rows[i][9] + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" +((data2.rows[i][11])*(10^11)) + "</center></td>";
+
+
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + data2.metaData.names["OMHUToxZR03"] + "</center></td>";
+
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2+ "<td><center>" + data2.rows[i][12] + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" + 'NA' + "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" +  'NA'+ "</center></td>";
+                        tableDataHtml2 = tableDataHtml2 + "<td><center>" +data2.rows[i][13] + "</center></td>";
+
+                        if(data2.rows[i][13] =="") {
+
+                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + "Provider code invalid" + "</center></td>";
+                            completeRow_stage3(index,data);
+
+                        }
+
+                        else{
+
+
+                            $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data2.rows[i][13], function (json21) {
+
+                                if(json21.trackedEntityInstances.length ==0) {
+
+                                    tableDataHtml2 = tableDataHtml2 + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                    completeRow_stage3(index,data);
+
+                                }
+                                else
+                                {
+                                    for (var j = 0; j < json21.trackedEntityInstances[0].attributes.length; j++)
+                                    {
+                                        if (json21.trackedEntityInstances[0].attributes[j].displayName == 'Name') {
+
+                                            tableDataHtml2 = tableDataHtml2 + "<td><center>" + json21.trackedEntityInstances[0].attributes[j].value + "</center></td>";
+                                            completeRow_stage3(index,data);
+                                        }
+                                    }
+
+                                }
+
+                            });
+
+                        }
+
+                   }
+                // data for area mapping
+
+                 
+                $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage4+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=sBD5FEalBsU&displayProperty=NAME&desc=EVENTDATE", function(data3){
+                   //     def_stage4 = $.Deferred();
+                        headerHtml = headerHtml + "</tr></thead>";
+                       // $('#datavalue1').html("");
+                       // $('#datavalue1').append(headerHtml);
+                         tableDataHtml3 = "<tbody>";
+
+                        var ids;
+                        populateData_stage4(0,data3);
+                        function completeRow_stage4(index,data){
+                            tableDataHtml3 = "<tr>" + tableDataHtml3 + "</tr>";
+                            populateData_stage4(index+1,data);
+
+                        }
+                        function populateData_stage4(index,data){
+                            if (index == data.rows.length){
+
+                                def_stage4.resolve("");
+                                return
+                            }
+                            var i= index;
+
+                       // if(data3.rows[i][9] == 'Male'){
+						
+						 tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + (data.rows.length+ data2.rows.length +i) + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][2] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][8] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][10] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" +data3.rows[i][9] + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'<center>" +((data3.rows[i][11])*(10^11)) + "</center></td>";
+
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.metaData.names["k7gHjJ4LFOU"] + "</center></td>";
+
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3= tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA'+ "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + 'NA' + "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" +  'NA'+ "</center></td>";
+                                tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + data3.rows[i][12] + "</center></td>";
+
+                                if(data.rows[i][12] =="") {
+
+                                    tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
+                                    completeRow_stage4(index,data);
+
+                                }
+
+                                else{
+                                    $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&filter=ndf6du48Fy5:eq:" + data3.rows[i][12], function (json11) {
+
+                                        if(json11.trackedEntityInstances.length ==0) {
+
+                                            tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + "Provider code invalid" + "</center></td>";
+                                            completeRow_stage4(index,data);
+
+
+                                        }
+                                        else
+                                        {
+                                            for (var j = 0; j < json11.trackedEntityInstances[0].attributes.length; j++)
+                                            {
+                                                if (json11.trackedEntityInstances[0].attributes[j].displayName == 'Name') {
+
+                                                    tableDataHtml3 = tableDataHtml3 + "<td style='color:red'><center>" + json11.trackedEntityInstances[0].attributes[j].value + "</center></td>";
+                                                    completeRow_stage4(index,data);
+
+                                                }
+                                            }
+
+                                        }
+                                    });
+                                }
+						
+						//}// end if--male
+						
+						
+						} // end function
+                      //  $('#datavalue1').append(tableDataHtml, tableDataHtml1, tableDataHtml2,tableDataHtml3);
+// data for house hold visits
+                  
+                    $.get("../api/analytics/events/query/TbYUPaBChYR.json?stage="+stage5+"&startDate="+startDate+"&endDate="+endDate+"&dimension=ou:"+orgnUnit+"&dimension=MCJaNkHvR4k&dimension=ZBdTzQfOkOK&dimension=zNq2hXkOTga&dimension=SxSh9297ihW&dimension=qbK1eGEgVD4&dimension=vKpDeWYKhHk&dimension=nUqWTyxWCZs&dimension=gBdx1XMCySe&displayProperty=NAME&desc=EVENTDATE", function(data4){
+                            headerHtml = headerHtml + "</tr></thead>";
+                          //  $('#datavalue1').html("");
+                          //  $('#datavalue1').append(headerHtml);
+                             tableDataHtml4 = "<tbody>";
+
+                            var ids;
+                            for (var i = 0; i < data4.rows.length; i++) {
+
+							if (data4.rows[i][9] == 'Female')
+							{
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + (data.rows.length+ data2.rows.length +data3.rows.length+i+data1.rows.length+1) + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][2] + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][8] + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][10] + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" +data4.rows[i][9] + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" +((data4.rows[i][11])*(10^11)) + "</center></td>";
+                               
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.metaData.names["n2CFuvwUvnh"] + "</center></td>";
+
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][12] + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + data4.rows[i][15] + "</center></td>";
+                                tableDataHtml4= tableDataHtml4 + "<td><center>" +data4.rows[i][13] + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" +  data4.rows[i][14]+ "</center></td>";
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + 'NA' + "</center></td>";
+
+                                tableDataHtml4 = tableDataHtml4 + "<td><center>" + "Provider code invalid" + "</center></td>";
+                                tableDataHtml4 = "<tr>" + tableDataHtml4 + "</tr>";
+							}
+								
+								
+                            }// end for
+
+                            tableDataHtml4 = tableDataHtml4 + "</tbody>";
+                            def_stage5.resolve("");
+
+                           // $('#datavalue1').append(tableDataHtml, tableDataHtml1, tableDataHtml2,tableDataHtml3,tableDataHtml4);
+
+                        });
+
+
+                    });
+
+                });
+            });
+
+      });
+
+        $.when(def_stage1,def_stage2,def_stage3,def_stage4,def_stage5).done(function(){
+            $('#datavalue1').append(tableDataHtml, tableDataHtml1,tableDataHtml2,tableDataHtml3,tableDataHtml4);
+
+        });
+
+
+        // });
+
+
+    }
+
+
+
+    function loadReport() {
+        var htmlReport = "";
+        var selYear = gotPeriod.substring(0, 4);
+        var selMonth = gotPeriod.substring(4, 6);
+
+        //console.log( jsonData1 );
+        $("#" + showingTable + " > thead").html("");
+
+        htmlReport += "<thead><tr bgcolor='#F2DDDC' align='center' height='44'>";
+        // htmlReport += "<td>OrgUnit</td>";
+        $.each(tableDX, function () {
+            htmlReport += "<td>" + this.dxName + "</td>;";
+        });
+        htmlReport += "</tr></thead>";
+
+        $("#" + showingTable + " > tbody").html("");
+        htmlReport += "<tbody>";
+        $.each(orgUnitChildren, function (index1, ou) {
+            htmlReport += "<tr>";
+            htmlReport += "<td align='left'style='padding-left:5px'>" + ou.name + "</td>";
+            $.each(tableDX, function (index2, de) {
+                var temp = getCellValue(jsonData1, de.dxId, ou.id, periodsStr);
+                htmlReport += "<td align='center'>" + temp + "</td>";
+            });
+            htmlReport += "</tr>";
+        });
+        htmlReport += "</tbody>";
+
+        $("#" + showingTable).append(htmlReport);
+        hideLoad();
+    }
+
+    function getCellValue(json, de, ou, periodsStr) {
+        var result = 0;
+        for (var i = 0; i < json.rows.length; i++) {
+            //console.log( json.rows[i][0] + " : " + json.rows[i][1] + " : " + json.rows[i][2] + " : " + json.rows[i][3] );
+            //console.log( de + " : " + ou + " : " + coc );
+            //console.log( "********************************************" );
+            if (json.rows[i][0] == de && json.rows[i][2] == periodsStr && json.rows[i][1] == ou && json.rows[i][3] != null) {
+                result = json.rows[i][3];
+            }
+        }
+        return parseInt(result);
+    }
+
+</script>
+
+
+<!-- download script ------------------------------------------------------
+		--------------------------------------------------------------------------
+		-------------------------------------------------------------------------------------- -->
+<script type="text/javascript">
+    var tablesToExcel = (function () {
+        var uri = 'data:application/vnd.ms-excel;base64,', tmplWorkbookXML = '<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">' + '<DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Author>ThaiND</Author><Created>{created}</Created></DocumentProperties>' + '<Styles><Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Horizontal="Center" ss:WrapText="1"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders><Font/><Interior /><NumberFormat /><Protection /></Style><Style ss:ID="s21"><Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style> <Style ss:ID="s22"><Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/><Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style><Style ss:ID="s64"> <Alignment ss:WrapText="1" ss:Horizontal="Center" ss:Vertical="Center" ss:Indent="0" ss:Rotate="90"/><Font ss:Size="10" ss:Bold="1" /><Interior ss:Color="#999999" ss:Pattern="Solid" /> </Style> </Styles>' + '{worksheets}</Workbook>', tmplWorksheetXML = '<Worksheet ss:Name="{nameWS}"><Table><Column ss:AutoFitWidth="0" ss:Width="100"/><Column ss:AutoFitWidth="0" ss:Width="150"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/><Column ss:AutoFitWidth="0" ss:Width="80"/>{rows}</Table></Worksheet>', tmplCellXML = '<Cell ss:StyleID="{sid}" ss:MergeAcross="{mrg}"><Data ss:Type="{dtype}">{data}</Data></Cell>', base64 = function (s) {
+                    return window.btoa(unescape(encodeURIComponent(s)))
+                }
+                , format = function (s, c) {
+                    return s.replace(/{(\w+)}/g, function (m, p) {
+                        return c[p];
+                    })
+                }
+
+        return function (tables, wsnames, wbname) {
+            var ctx = "";
+            var workbookXML = "";
+            var worksheetsXML = "";
+            var rowsXML = "";
+
+            for (var i = 0; i < tables.length; i++) {
+
+                if (!tables[i].nodeType)
+                    tables[i] = document.getElementById(tables[i]);
+
+                for (var j = 0; j < tables[i].rows.length; j++) {
+                    rowsXML += '<Row>'
+                    for (var k = 0; k < tables[i].rows[j].cells.length; k++) {
+
+                        var cols = tables[i].rows[j].cells[k].getAttribute("colspan");
+                        var rws = tables[i].rows[j].cells[k].getAttribute("rowspan");
+                        var styl = tables[i].rows[j].cells[k].getAttribute("bgcolor");
+                        var styl2 = tables[i].rows[j].getAttribute("bgcolor");
+                        var cls = tables[i].rows[j].cells[k].getAttribute("class");
+
+                        var dataType = 'String';
+                        var dataValue = tables[i].rows[j].cells[k].innerHTML;
+                        var typeD = "";
+                        var parsed = parseInt(dataValue);
+
+                        if (parsed == dataValue) {
+                            typeD = "Number";
+                        }
+                        else {
+                            typeD = "String";
+                        }
+
+
+                        if (styl2) {
+                            if (cols) {
+                                if (cls == "aso") {
+                                    ctx = {data: dataValue, mrg: cols - 1, sid: "s64", dtype: typeD};
+                                    rowsXML += format(tmplCellXML, ctx);
+                                }
+                                else {
+                                    ctx = {data: dataValue, mrg: cols - 1, sid: "s22", dtype: typeD};
+                                    rowsXML += format(tmplCellXML, ctx);
+                                }
+                            }
+
+                            else {
+                                if (cls == "aso") {
+                                    ctx = {data: dataValue, mrg: 0, sid: "s64", dtype: typeD};
+                                    rowsXML += format(tmplCellXML, ctx);
+                                }
+                                else {
+                                    ctx = {data: dataValue, mrg: 0, sid: "s22", dtype: typeD};
+                                    rowsXML += format(tmplCellXML, ctx);
+                                }
+                            }
+                        }
+
+                        else if (styl) {
+                            if (cols) {
+                                ctx = {data: dataValue, mrg: cols - 1, sid: "s21", dtype: typeD};
+                                rowsXML += format(tmplCellXML, ctx);
+                            }
+
+                            else {
+                                ctx = {data: dataValue, mrg: 0, sid: "s21", dtype: typeD};
+                                rowsXML += format(tmplCellXML, ctx);
+                            }
+                        }
+
+                        else {
+                            if (cols) {
+                                ctx = {data: dataValue, mrg: cols - 1, sid: "Default", dtype: typeD};
+                                rowsXML += format(tmplCellXML, ctx);
+                            }
+
+                            else {
+                                ctx = {data: dataValue, mrg: 0, sid: "Default", dtype: typeD};
+                                rowsXML += format(tmplCellXML, ctx);
+                            }
+
+                        }
+
+                    }
+                    rowsXML += '</Row>'
+                }
+                ctx = {rows: rowsXML, nameWS: wsnames[i] || 'Sheet' + i};
+                worksheetsXML += format(tmplWorksheetXML, ctx);
+                rowsXML = "";
+            }
+
+            ctx = {created: (new Date()).getTime(), worksheets: worksheetsXML};
+            workbookXML = format(tmplWorkbookXML, ctx);
+
+            //console.log(workbookXML);
+
+            var link = document.createElement("A");
+            link.href = uri + base64(workbookXML);
+            link.download = wbname || 'Workbook.xls';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    })();
+</script>
+<script type="text/javascript">
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+</script>
+<p><span style="font-size:12px;">
+<style>
+    th {
+        text-align: center;
+    }
+
+    td {
+        padding: 3px 7px;
+
+    }
+
+    .bd {
+        border-style: solid;
+        border-color: #000000;
+    }
+
+    #cover {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 5;
+        width: 100%;
+        height: 100%;
+    }
+
+    #loads {
+        height: 100px;
+        width: 500px;
+        position: fixed;
+        z-index: 10;
+        margin: 0 auto;
+        top: 50%;
+        left: 50%;
+        margin-top: -50px;
+        margin-left: -250px;
+        background: #999;
+        border: 5px solid #cccccc;
+        text-align : center;
+        border-radius: 5px;
+    }
+
+    .loading {
+        width: 400px;
+        font-size: 20px;
+        font-family: verdana;
+        font-weight: bolder;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin: 0 auto;
+        margin-top: -8px;
+        margin-left: -200px;
+    }
+
+
+
+
+</style>
+
+</span></p>
+<table>
+    <tr>
+        <td>
+            <input type="button" id="btnBack" value=" Go to Dashboard"
+                   onclick="location.href='../dhis-web-dashboard-integration/index.action'"/>
+            <input type="button" onclick="printContent('printing');" value="Print"/>
+            <!--<input type="button" id="btnExport" value=" Download Excel " />-->
+
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>Start Date:</td>
+        <td>End Date:</td>
+    </tr>
+    <tr>
+        <td><input type="text" id="datepicker"></td>
+        <td><input type="text" id="datepicker1"></td>
+        <td><input type="button" onClick="loadDataX()" value="go" style="width:30px"/></td>
+    </tr>
+</table>
+<select id="workerdropdown" style=" margin-left:10%">
+    <option selected value="base">Please Select Worker</option>
+
+</select>
+</br></br>
+</br></br>
+
+<div id="printing">
+    <table>
+        <tr>
+            <td>
+                <table border="1" cellspacing="6" cellpadding="4" width="100%"
+                       style="border-collapse:collapse; border:2px; font-weight:bolder">
+                    <thead>
+                    <tr align="center" height="27">
+                        <td colspan="30" width="2082" height="27" class="col" bgcolor="#32849C"><font color="white"><b>IPC Worker Field Force Monitoring Daily Activity Report
+                        </b></font></td>
+                    </tr>
+                    <tr bgcolor="#F2DDDC" align="center" height="20">
+                        <td colspan="1" height="20" align="right"><b>Parent OU:</b></td>
+                        <td colspan="2" id="selectedOUName">&nbsp;</td>
+                        <td colspan="5">&nbsp;</td>
+                        <td colspan="1" align="right"><b>Month: </b></td>
+                        <td colspan="2" id="period">&nbsp;</td>
+                    </tr>
+                    </thead>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table id="datavalue1" border="1" cellspacing="6" cellpadding="4" width="100%"
+                       style="border-collapse:collapse; border:2px; font-weight:bolder;
+    border-spacing: 0;">
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
