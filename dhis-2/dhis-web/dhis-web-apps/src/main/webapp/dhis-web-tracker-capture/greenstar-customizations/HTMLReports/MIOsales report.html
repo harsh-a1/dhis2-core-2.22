@@ -187,7 +187,7 @@
 
         var periodStr = startDate;
         var events = [];
-        document.getElementById('selectedOUName').innerHTML = orgUnit.name;
+        document.getElementById('selectedOUName').innerHTML = regionorgname;
         document.getElementById('period').innerHTML = periodStr;
 
         def_stage2 = $.Deferred();
@@ -287,7 +287,7 @@
 
         $.get("../api/analytics/events/query/yCEiGZVSHP7.json?stage="+stage3+"&dimension=pe:"+periodStrmonthly+"&dimension=ou:EaH1MW0W9Ri&dimension=MCJaNkHvR4k&dimension=N4labxVCcQf&dimension=KzJDg9X6uDN&displayProperty=NAME", function(products){
 
-                            $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage=" + stage1 + "&dimension=pe:" + periodStrmonthly + "&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P&dimension=GlORnHsQGA8&displayProperty=NAME", function (data) {
+                            $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage=" + stage1 + "&dimension=pe:" + periodStrmonthly + "&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P&dimension=GlORnHsQGA8&dimension=PMMhhsapMP3&displayProperty=NAME", function (data) {
 
                                 for (k = 0; k < data.rows.length; k++) {
 
@@ -316,7 +316,7 @@
 
 
                                             tableDataHtml = tableDataHtml + "<tr><td><center>" + regionorgname + "</center></td>";
-                                            tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                                            tableDataHtml = tableDataHtml + "<td><center>" +data.rows[0][10]  + "</center></td>";
                                             tableDataHtml = tableDataHtml + "<td><center>" + products.rows[t][8] + "</center></td>";
                                             tableDataHtml = tableDataHtml + "<td><center>" + SelectedDate + "</center></td>";
 
