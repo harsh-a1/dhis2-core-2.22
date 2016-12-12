@@ -1,0 +1,1178 @@
+<script type="text/javascript"  async>
+    var ecptarget= 0,novotarget=0;
+    var periods = dhis2.report.periods;
+    var mediname;
+    var period = periods[0];
+    var orgUnit = dhis2.report.organisationUnit;
+    orgUnit.parent = dhis2.report.organisationUnitHierarchy[1];
+    var orgUnitChildren = dhis2.report.organisationUnitChildren;
+    var orgUnitUIDs = "";
+
+    var prgUID = "TbYUPaBChYR";
+    var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
+    var tableDataHtml;
+    var orgnUnit ="tZJsIdHAfKq";
+    var MIOOrgMap = []; var MIOName = [],orgUnitsAssignedToMIO =[];
+    var stage1 = "DZFh7HUSfum";
+    var stage2 = "ji6F1SNQaqh";
+    var stage3 = "j0b0ZKgt8f4";
+
+    if (jQuery.when.all === undefined) {
+        jQuery.when.all = function (deferreds) {
+            var deferred = new jQuery.Deferred();
+            $.when.apply(jQuery, deferreds).then(
+                    function () {
+                        deferred.resolve(Array.prototype.slice.call(arguments));
+                    },
+                    function () {
+                        deferred.fail(Array.prototype.slice.call(arguments));
+                    });
+
+            return deferred;
+        }
+    }
+
+
+    var deUIDs = "";
+
+    var url = window.location.href;
+    var params = url.split('=');
+    var gotPeriod = params[2];
+    var showingTable = "datavalue1";
+
+    jQuery(document).ready(function () {
+// tracked entity for MIO
+
+        $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&trackedEntity=bktnaUECtSL", function (json3) {
+
+
+            $.each(json3.trackedEntityInstances, function (index, item) {
+                $.each(item.attributes, function (index1, item1) {
+
+                    if (item1.code == "Firstname") {
+                        $('#workerdropdown').append(
+                                $('<option></option>').val(item.trackedEntityInstance).html(item1.value).text(item1.value)
+                        );
+                    }
+                });
+            });
+
+        });
+
+                    // });
+
+
+
+        //validateReport();
+        $(".hideInPrint").hide();
+        orgUnitChildren.sort(function (a, b) {
+            if (a.name < b.name)
+                return -1;
+            if (a.name > b.name)
+                return 1;
+            return 0;
+        });
+
+
+        //    loadDataX();
+        $("#datepicker").datepicker({dateFormat: "dd/mm/yy"});
+        $("#datepicker1").datepicker({dateFormat: "dd/mm/yy"});
+
+
+        $("#btnExport").click(function (e) {
+            window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#printing').html()));
+            e.preventDefault();
+        });
+        $.getJSON("../api/organisationUnitGroupSets/MVyDCUdQZ4a.json?fields=organisationUnitGroups[id,name]", function (data) {
+            $.each(data.organisationUnitGroups, function (index, item) {
+                $('#dropregion').append(
+                        $('<option></option>').val(item.id).html(item.name).text(item.name)
+                );
+
+            });
+
+        });
+        $("#dropregion").change(function () {
+            regionorg=dropregion.value;
+            regionorgname = $(this).find("option:selected").text();
+        });
+    })
+
+    function hideLoad() {
+        document.getElementById("cover").style.display = "none";
+        document.getElementById("loads").style.display = "none";
+        document.getElementById("loading").style.display = "none";
+        document.getElementsByTagName("body")[0].style.overflow = "scroll";
+    }
+
+
+
+    function getPeriod(pr) {
+        var year = pr.substring(0, 4);
+        var month = pr.substring(4, 6);
+        var strMonth = "";
+
+        if (month == "01" || month == "1")        strMonth = "January";
+        else if (month == "02" || month == "2")    strMonth = "February";
+        else if (month == "03" || month == "3")    strMonth = "March";
+        else if (month == "04" || month == "4")    strMonth = "April";
+        else if (month == "05" || month == "5")    strMonth = "May";
+        else if (month == "06" || month == "6")    strMonth = "June";
+        else if (month == "07" || month == "7")    strMonth = "July";
+        else if (month == "08" || month == "8")    strMonth = "August";
+        else if (month == "09" || month == "9")    strMonth = "September";
+        else if (month == "10")                strMonth = "October";
+        else if (month == "11")                strMonth = "November";
+        else if (month == "12")                strMonth = "December";
+
+        return strMonth + " " + year;
+    }
+
+    var periodArray = [];
+    //  var cYear = parseInt(gotPeriod.substring(0, 4));
+    // var cMonth = parseInt(gotPeriod.substring(4, 6));
+    //  var periodsStr = gotPeriod.substring(0, 4) + "" + gotPeriod.substring(4, 6);
+
+    var jsonData1;
+    var jsonData2;
+    var jsonData3;
+    var c = 0;
+
+    function prepareIdToObjectMap(object, id) {
+        var map = [];
+        for (var i = 0; i < object.length; i++) {
+            map[object[i][id]] = object[i];
+        }
+        return map;
+    }
+
+    function loadDataX() {
+        //
+        tableDataHtml = "";
+
+
+        var a = document.getElementById('datepicker').value;
+        startDate = a.split("/").reverse().join("");
+
+        var selectedMonth = startDate.substring(4, 6);
+        var selectedMonth_1 = selectedMonth-1;
+        if(selectedMonth_1 <10){
+            selectedMonth_1 = "0"+(selectedMonth-1);
+        }
+        var selectedMonth_2 = selectedMonth-2;
+        if(selectedMonth_2 <10){
+            selectedMonth_2 = "0"+(selectedMonth-2);
+        }
+        var selectedMonth_3 = selectedMonth-3;
+        if(selectedMonth_3 <10){
+            selectedMonth_3 = "0"+(selectedMonth-3);
+        }
+        var periodStr2 = startDate.substring(2, 4);
+        var periodStrday = startDate.substring(6, 8);
+        var periodStrmonthly = startDate.substring(0, 4)+selectedMonth_1+";"+startDate.substring(0, 4)+selectedMonth_2+";"+startDate.substring(0, 4)+selectedMonth_3;
+
+        var month1 =  periodStrmonthly.substring(4);
+        if (month1 == "01" || month1 == "1")        month1 = "January";
+        else if (month1 == "02" || month1 == "2")    month1 = "February";
+        else if (month1 == "03" || month1 == "3")    month1 = "March";
+        else if (month1 == "04" || month1 == "4")    month1 = "April";
+        else if (month1 == "05" || month1 == "5")    month1 = "May";
+        else if (month1 == "06" || month1 == "6")    month1 = "June";
+        else if (month1 == "07" || month1 == "7")    month1 = "July";
+        else if (month1 == "08" || month1 == "8")    month1 = "August";
+        else if (month1 == "09" || month1 == "9")    month1 = "September";
+        else if (month1 == "10")                month1 = "October";
+        else if (month1 == "11")                month1 = "November";
+        else if (month1 == "12")                month1 = "December";
+
+        var SelectedDate = periodStrmonthly.substring(0, 4) + "-" + month1;
+
+
+        var periodStr = startDate;
+        var events = [];
+     //   document.getElementById('selectedOUName').innerHTML = regionorgname;
+        document.getElementById('period').innerHTML = periodStr;
+
+        // prepare table header
+        var headerHtml = "<thead  ><tr bgcolor='#F2DDDC' ><th rowspan='2'><center>Team Name</center></th>" +
+                        "<th rowspan='2'><center>Region Name</center></th>" +
+                        "<th  rowspan='2'><center>Depo Name</center></th>" +
+                        "<th  rowspan='2'><center>M&P Town Code</center></th>" +
+                        "<th rowspan='2'><center>M&P Town Name</center></th>" +
+                        "<th rowspan='2'><center>Customer code</center></th>" +
+                        "<th rowspan='2'><center>Customer name</center></th>" +
+                        "<th rowspan='2'><center>Brand</center></th>" +
+                        "<th rowspan='2'><center>Product size</center></th>" +
+                        "<th rowspan='2'  bgcolor='#F2DDDC'><center>Month 1- "+selectedMonth_1+"</center></th>" +
+                        "<th rowspan='2'><center>Month 2- "+selectedMonth_2+"</center></th>"+
+                        "<th rowspan='2'  bgcolor='#F2DDDC'><center>Month 3- "+selectedMonth_3+"</center></th></tr>"
+
+
+                ;
+
+        headerHtml = headerHtml + "</tr></thead>";
+        $('#datavalue1').html("");
+
+        $('#datavalue1').append(headerHtml);
+        //	tableDataHtml="";
+        tableDataHtml = "<tbody>";
+
+
+        var AchievementArrAllProductsMonth_1 = [], AchievementArrAllProductsMonth_2=[], AchievementArrAllProductsMonth_3=[], size=[];
+        var ECPMonth_1, ECPMonth_2, ECPMonth_3;
+        var NovadolMonth_1, NovadolMonth_2, NovadolMonth_3;
+        var FemijectMonth_1,FemijectMonth_2, FemijectMonth_3;
+        var NovajectMonth_1, NovajectMonth_2, NovajectMonth_3;
+      var DepoMonth_1, DepoMonth_2,DepoMonth_3;
+        var MultiMonth_1,MultiMonth_2, MultiMonth_3;
+        var SafeMonth_1, SafeMonth_2, SafeMonth_3;
+
+        var ECPMap_month1_1 =[],ECPMap_month2_1=[], ECPMap_month3, ECPMap_month3_1=[],ECPMap_month2,ECPMap_month1 ;
+        var NovodolMap_month1_1 =[],NovodolMap_month2_1=[], NovodolMap_month3, NovodolMap_month3_1=[],NovodolMap_month2,NovodolMap_month1 ;
+        var FemiMap_month1_1 =[],FemiMap_month2_1=[], FemiMap_month3, FemiMap_month3_1=[],FemiMap_month2,FemiMap_month1 ;
+        var DepoMap_month1_1 =[],DepoMap_month2_1=[], DepoMap_month3, DepoMap_month3_1=[],DepoMap_month2,DepoMap_month1 ;
+        var NovaMap_month1_1 =[],NovaMap_month2_1=[], NovaMap_month3, NovaMap_month3_1=[],NovaMap_month2,NovaMap_month1 ;
+        var MultiMap_month1_1 =[],MultiMap_month2_1=[], MultiMap_month3, MultiMap_month3_1=[],MultiMap_month2,MultiMap_month1 ;
+        var SafeMap_month1_1 =[],SafeMap_month2_1=[], SafeMap_month3, SafeMap_month3_1=[],SafeMap_month2,SafeMap_month1 ;
+
+        var  FemiMap=[], DepoMap=[], MultiMap=[], safeMap=[], NovaJMap=[];
+
+
+        $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage=DZFh7HUSfum&dimension=pe:"+periodStrmonthly+"&dimension=ou:tZJsIdHAfKq&dimension=BeVvgozFTzn&dimension=BEUJq7HRTVF&dimension=ca8KFIqeM4o&dimension=NeV7yZBr3m2&dimension=GlORnHsQGA8&displayProperty=NAME&desc=EVENTDATE", function(products) {
+
+            //    $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage=" + stage1 + "&dimension=pe:" + periodStrmonthly + "&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P&dimension=GlORnHsQGA8&dimension=PMMhhsapMP3&displayProperty=NAME", function (data) {
+
+            for (var s = 0; s < products.rows.length; s++) {
+                var ECPEventMonth1 = products.rows[s][2];
+                ECPEventMonth1 = ECPEventMonth1.substring(0, ECPEventMonth1.indexOf(' '));
+                var splitECPDateMonth1 = ECPEventMonth1.split("-").reverse().join("");
+                var EventMonth_1ECP = splitECPDateMonth1.substring(3, 4);
+                if (EventMonth_1ECP < 10) {
+                    EventMonth_1ECP = "0" + EventMonth_1ECP;
+                }
+                if (products.rows[s][10] == 'E C P' && EventMonth_1ECP == selectedMonth_1) {
+                    ECPMap_month1_1.push({
+                        name: "ECP",
+                        latestEventDate: products.rows[s][2],
+                        val: products.rows[s][12],
+                        size: products.rows[s][11]
+                    });
+                    ECPMap_month1 = ECPMap_month1_1[0];
+                    s++;
+
+                }
+                else if (products.rows[s][10] == 'E C P' && EventMonth_1ECP == selectedMonth_2) {
+                    ECPMap_month2_1.push({
+                        name: "ECP",
+                        latestEventDate: products.rows[s][2],
+                        val: products.rows[s][12],
+                        size: products.rows[s][11]
+                    });
+                    ECPMap_month2 = ECPMap_month2_1[0];
+
+                    s++;
+
+                }
+                else if (products.rows[s][10] == 'E C P' && EventMonth_1ECP == selectedMonth_3) {
+                    ECPMap_month3_1.push({
+                        name: "ECP",
+                        latestEventDate: products.rows[s][2],
+                        val: products.rows[s][12],
+                        size: products.rows[s][11]
+                    });
+                    ECPMap_month3 = ECPMap_month3_1[0];
+                    s++;
+                }
+                else {
+                    s++;
+                }
+            }
+
+            for (var s = 0; s < products.rows.length; s++) {
+                var NovodolEventMonth1 = products.rows[s][2];
+                NovodolEventMonth1 = NovodolEventMonth1.substring(0, ECPEventMonth1.indexOf(' '));
+                var splitNovodolDateMonth1 = NovodolEventMonth1.split("-").reverse().join("");
+                var EventMonth_1Novodol = splitNovodolDateMonth1.substring(3, 4);
+                if (EventMonth_1Novodol < 10) {
+                    EventMonth_1Novodol = "0" + EventMonth_1Novodol;
+                }
+                if (products.rows[s][10] == 'NOVODOL CYCLES' && EventMonth_1Novodol == selectedMonth_1) {
+                    NovodolMap_month1_1.push({
+                        name: "NOVODOL",
+                        latestEventDate: products.rows[s][2],
+                        val: products.rows[s][12],
+                        size: products.rows[s][11]
+                    });
+                    NovodolMap_month1 = NovodolMap_month1_1[0];
+                    s++;
+
+                }
+                else if (products.rows[s][10] == 'NOVODOL CYCLES' && EventMonth_1Novodol == selectedMonth_2) {
+                    NovodolMap_month2_1.push({
+                        name: "NOVODOL",
+                        latestEventDate: products.rows[s][2],
+                        val: products.rows[s][12],
+                        size: products.rows[s][11]
+                    });
+                    NovodolMap_month2 = NovodolMap_month2_1[0];
+
+                    s++;
+
+                }
+                else if (products.rows[s][10] == 'NOVODOL CYCLES' && EventMonth_1Novodol == selectedMonth_3) {
+                    NovodolMap_month3_1.push({
+                        name: "NOVODOL",
+                        latestEventDate: products.rows[s][2],
+                        val: products.rows[s][12],
+                        size: products.rows[s][11]
+                    });
+                    NovodolMap_month3 = NovodolMap_month3_1[0];
+                    s++;
+                }
+                else {
+                    s++;
+                }
+            }
+
+            for (var s = 0; s < products.rows.length; s++) {
+
+
+                    var femiEventMonth1 = products.rows[s][2];
+                    femiEventMonth1 = femiEventMonth1.substring(0, ECPEventMonth1.indexOf(' '));
+                    var splitFemiDateMonth1 = femiEventMonth1.split("-").reverse().join("");
+                    var EventMonth_1Femi = splitFemiDateMonth1.substring(3, 4);
+                    if (EventMonth_1Femi < 10) {
+                        EventMonth_1Femi = "0" + EventMonth_1Femi;
+                    }
+                    if (products.rows[s][10] == 'FEMIJECT' && EventMonth_1Femi == selectedMonth_1) {
+                        FemiMap_month1_1.push({
+                            name: "FEMIJECT",
+                            latestEventDate: products.rows[s][2],
+                            val: products.rows[s][12],
+                            size: products.rows[s][11]
+                        });
+                        FemiMap_month1 = FemiMap_month1_1[0];
+                        s++;
+
+                    }
+                    else if (products.rows[s][10] == 'FEMIJECT' && EventMonth_1Femi == selectedMonth_2) {
+                        FemiMap_month2_1.push({
+                            name: "FEMIJECT",
+                            latestEventDate: products.rows[s][2],
+                            val: products.rows[s][12],
+                            size: products.rows[s][11]
+                        });
+                        FemiMap_month2 = FemiMap_month2_1[0];
+
+                        s++;
+
+                    }
+                    else if (products.rows[s][10] == 'FEMIJECT' && EventMonth_1Femi == selectedMonth_3) {
+                        FemiMap_month3_1.push({
+                            name: "FEMIJECT",
+                            latestEventDate: products.rows[s][2],
+                            val: products.rows[s][12],
+                            size: products.rows[s][11]
+                        });
+                        FemiMap_month3 = FemiMap_month3_1[0];
+                        s++;
+                    }
+                    else {
+                        s++;
+
+                    }
+
+                }
+
+
+            for(var s=0; s<products.rows.length; s++) {
+                    var novaEventMonth1 = products.rows[s][2];
+                    novaEventMonth1 = novaEventMonth1.substring(0, ECPEventMonth1.indexOf(' '));
+                    var splitNovaDateMonth1 = novaEventMonth1.split("-").reverse().join("");
+                    var EventMonth_1Nova = splitNovaDateMonth1.substring(3, 4);
+                    if (EventMonth_1Nova < 10) {
+                        EventMonth_1Nova = "0" + EventMonth_1Nova;
+                    }
+                    if (products.rows[s][10] == 'NOVAJECT' && EventMonth_1Nova == selectedMonth_1) {
+                        NovaMap_month1_1.push({
+                            name: "NOVAJECT",
+                            latestEventDate: products.rows[s][2],
+                            val: products.rows[s][12],
+                            size: products.rows[s][11]
+                        });
+                        NovaMap_month1 = NovaMap_month1_1[0];
+                        s++;
+
+                    }
+                    else if (products.rows[s][10] == 'NOVAJECT' && EventMonth_1Nova == selectedMonth_2) {
+                        NovaMap_month2_1.push({
+                            name: "NOVAJECT",
+                            latestEventDate: products.rows[s][2],
+                            val: products.rows[s][12],
+                            size: products.rows[s][11]
+                        });
+                        NovaMap_month2 = NovaMap_month2_1[0];
+
+                        s++;
+
+                    }
+                    else if (products.rows[s][10] == 'NOVAJECT' && EventMonth_1Nova == selectedMonth_3) {
+                        NovaMap_month3_1.push({
+                            name: "NOVAJECT",
+                            latestEventDate: products.rows[s][2],
+                            val: products.rows[s][12],
+                            size: products.rows[s][11]
+                        });
+                        NovaMap_month3 = NovaMap_month3_1[0];
+                        s++;
+                    }
+                    else {
+                        s++;
+
+                    }
+
+
+            }
+                for(var s=0; s<products.rows.length; s++) {
+                        var depoEventMonth1 = products.rows[s][2];
+                        depoEventMonth1 = depoEventMonth1.substring(0, ECPEventMonth1.indexOf(' '));
+                        var splitDepoDateMonth1 = depoEventMonth1.split("-").reverse().join("");
+                        var EventMonth_1Depo = splitDepoDateMonth1.substring(3, 4);
+                        if (EventMonth_1Depo < 10) {
+                            EventMonth_1Depo = "0" + EventMonth_1Depo;
+                        }
+                        if (products.rows[s][10] == 'DEPO PROVERA' && EventMonth_1Depo == selectedMonth_1) {
+                            DepoMap_month1_1.push({
+                                name: "DEPO PROVERA",
+                                latestEventDate: products.rows[s][2],
+                                val: products.rows[s][12],
+                                size: products.rows[s][11]
+                            });
+                            DepoMap_month1 = DepoMap_month1_1[0];
+                            s++;
+
+                        }
+                        else if (products.rows[s][10] == 'DEPO PROVERA' && EventMonth_1Depo == selectedMonth_2) {
+                            DepoMap_month2_1.push({
+                                name: "DEPO PROVERA",
+                                latestEventDate: products.rows[s][2],
+                                val: products.rows[s][12],
+                                size: products.rows[s][11]
+                            });
+                            DepoMap_month2 = DepoMap_month2_1[0];
+
+                            s++;
+
+                        }
+                        else if (products.rows[s][10] == 'DEPO PROVERA' && EventMonth_1Depo == selectedMonth_3) {
+                            DepoMap_month3_1.push({
+                                name: "DEPO PROVERA",
+                                latestEventDate: products.rows[s][2],
+                                val: products.rows[s][12],
+                                size: products.rows[s][11]
+                            });
+                            DepoMap_month3 = DepoMap_month3_1[0];
+                            s++;
+                        }
+                        else {
+                            s++;
+
+                        }
+
+
+                }
+                    for(var s=0; s<products.rows.length; s++) {
+                            var multiEventMonth1 = products.rows[s][2];
+                            multiEventMonth1 = multiEventMonth1.substring(0, ECPEventMonth1.indexOf(' '));
+                            var splitMultiDateMonth1 = multiEventMonth1.split("-").reverse().join("");
+                            var EventMonth_1Multi = splitMultiDateMonth1.substring(3, 4);
+                            if (EventMonth_1Multi < 10) {
+                                EventMonth_1Multi = "0" + EventMonth_1Multi;
+                            }
+                            if (products.rows[s][10] == 'IUD MULTI LOAD' && EventMonth_1Multi == selectedMonth_1) {
+                                MultiMap_month1_1.push({
+                                    name: "IUD MULTI LOAD",
+                                    latestEventDate: products.rows[s][2],
+                                    val: products.rows[s][12],
+                                    size: products.rows[s][11]
+                                });
+                                MultiMap_month1 = MultiMap_month1_1[0];
+                                s++;
+
+                            }
+                            else if (products.rows[s][10] == 'IUD MULTI LOAD' && EventMonth_1Multi == selectedMonth_2) {
+                                MultiMap_month2_1.push({
+                                    name: "IUD MULTI LOAD",
+                                    latestEventDate: products.rows[s][2],
+                                    val: products.rows[s][12],
+                                    size: products.rows[s][11]
+                                });
+                                MultiMap_month2 = MultiMap_month2_1[0];
+
+                                s++;
+
+                            }
+                            else if (products.rows[s][10] == 'IUD MULTI LOAD' && EventMonth_1Multi == selectedMonth_3) {
+                                MultiMap_month2_1.push({
+                                    name: "IUD MULTI LOAD",
+                                    latestEventDate: products.rows[s][2],
+                                    val: products.rows[s][12],
+                                    size: products.rows[s][11]
+                                });
+                                MultiMap_month3 = MultiMap_month2_1[0];
+                                s++;
+                            }
+                            else {
+                                s++;
+
+                            }
+
+
+                    }
+                        for(var s=0; s<products.rows.length; s++) {
+                                var safeEventMonth1 = products.rows[s][2];
+                                safeEventMonth1 = safeEventMonth1.substring(0, ECPEventMonth1.indexOf(' '));
+                                var splitSafeDateMonth1 = depoEventMonth1.split("-").reverse().join("");
+                                var EventMonth_1Safe = splitSafeDateMonth1.substring(3, 4);
+                                if (EventMonth_1Safe < 10) {
+                                    EventMonth_1Safe = "0" + EventMonth_1Safe;
+                                }
+                                if (products.rows[s][10] == 'IUD SAFE LOAD' && EventMonth_1Safe == selectedMonth_1) {
+                                    SafeMap_month1_1.push({
+                                        name: "IUD SAFE LOAD",
+                                        latestEventDate: products.rows[s][2],
+                                        val: products.rows[s][12],
+                                        size: products.rows[s][11]
+                                    });
+                                    SafeMap_month1 = SafeMap_month1_1[0];
+                                    s++;
+
+                                }
+                                else if (products.rows[s][10] == 'IUD SAFE LOAD' && EventMonth_1Safe == selectedMonth_2) {
+                                    SafeMap_month2_1.push({
+                                        name: "IUD SAFE LOAD",
+                                        latestEventDate: products.rows[s][2],
+                                        val: products.rows[s][12],
+                                        size: products.rows[s][11]
+                                    });
+                                    SafeMap_month2 = SafeMap_month2_1[0];
+
+                                    s++;
+
+                                }
+                                else if (products.rows[s][10] == 'IUD SAFE LOAD' && EventMonth_1Safe == selectedMonth_3) {
+                                    SafeMap_month3_1.push({
+                                        name: "IUD SAFE LOAD",
+                                        latestEventDate: products.rows[s][2],
+                                        val: products.rows[s][12],
+                                        size: products.rows[s][11]
+                                    });
+                                    SafeMap_month3 = SafeMap_month3_1[0];
+                                    s++;
+                                }
+                                else {
+                                    s++;
+
+                                }
+
+
+                        }
+
+// filling values for month 1 ------ all products
+                                 if(ECPMap_month1 == undefined){ // length =0
+                                     ECPMonth_1 = 0;
+
+                                 }
+                                  else{
+                                     ECPMonth_1 =ECPMap_month1.val;
+                                 }
+                          AchievementArrAllProductsMonth_1.push(ECPMonth_1);
+
+                               if(NovodolMap_month1 == undefined){
+                                   NovadolMonth_1 = 0;
+
+              }
+                             else{
+                                   NovadolMonth_1 =NovodolMap_month1.val;
+                      }
+                          AchievementArrAllProductsMonth_1.push(NovadolMonth_1);
+
+            if(FemiMap_month1 == undefined){
+                FemijectMonth_1 = 0;
+
+            }
+            else{
+                FemijectMonth_1 =FemiMap_month1.val;
+            }
+            AchievementArrAllProductsMonth_1.push(FemijectMonth_1);
+
+            if(NovaMap_month1 == undefined){
+                NovajectMonth_1 = 0;
+
+            }
+            else{
+                NovajectMonth_1 =NovaMap_month1.val;
+            }
+            AchievementArrAllProductsMonth_1.push(NovajectMonth_1);
+
+            if(DepoMap_month1 ==undefined){
+                DepoMonth_1 = 0;
+
+            }
+            else{
+                DepoMonth_1 =DepoMap_month1.val;
+            }
+            AchievementArrAllProductsMonth_1.push(DepoMonth_1);
+
+
+            if(MultiMap_month1 == undefined){
+                MultiMonth_1 = 0;
+
+            }
+            else{
+                MultiMonth_1 = MultiMap_month1.val;
+            }
+            AchievementArrAllProductsMonth_1.push(MultiMonth_1);
+
+            if(SafeMap_month1 == undefined){
+                SafeMonth_1 = 0;
+
+            }
+            else{
+                SafeMonth_1 = SafeMap_month1.val;
+            }
+            AchievementArrAllProductsMonth_1.push(SafeMonth_1);
+
+ // // filling values for month 3 ------ all products
+            if(ECPMap_month3 == undefined){ // length =0
+                ECPMonth_3 = 0;
+
+            }
+            else{
+                ECPMonth_3 =ECPMap_month3.val;
+            }
+            AchievementArrAllProductsMonth_3.push(ECPMonth_3);
+
+            if(NovodolMap_month3 == undefined){
+                NovadolMonth_3 = 0;
+
+            }
+            else{
+                NovadolMonth_3 =NovodolMap_month3.val;
+            }
+            AchievementArrAllProductsMonth_3.push(NovadolMonth_3);
+
+            if(FemiMap_month3 == undefined){
+                FemijectMonth_3 = 0;
+
+            }
+            else{
+                FemijectMonth_3 =FemiMap_month3.val;
+            }
+            AchievementArrAllProductsMonth_3.push(FemijectMonth_3);
+            if(NovaMap_month3 == undefined){
+                NovajectMonth_3 = 0;
+
+            }
+            else{
+                NovajectMonth_3 =NovaMap_month3.val;
+            }
+            AchievementArrAllProductsMonth_3.push(NovajectMonth_3);
+            if(DepoMap_month3 ==undefined){
+                DepoMonth_3 = 0;
+
+            }
+            else{
+                DepoMonth_3 =DepoMap_month3.val;
+            }
+            AchievementArrAllProductsMonth_3.push(DepoMonth_3);
+
+
+            if(MultiMap_month3 == undefined){
+                MultiMonth_3 = 0;
+
+            }
+            else{
+                MultiMonth_3 = MultiMap_month3.val;
+            }
+            AchievementArrAllProductsMonth_3.push(MultiMonth_3);
+
+            if(SafeMap_month3 == undefined){
+                SafeMonth_3 = 0;
+
+            }
+            else{
+                SafeMonth_3 = SafeMap_month3.val;
+            }
+            AchievementArrAllProductsMonth_3.push(SafeMonth_3);
+
+
+            // // filling values for month 2 ------ all products
+            if(ECPMap_month2 == undefined){ // length =0
+                ECPMonth_2 = 0;
+
+            }
+            else{
+                ECPMonth_2 =ECPMap_month2.val;
+            }
+            AchievementArrAllProductsMonth_2.push(ECPMonth_2);
+
+            if(NovodolMap_month2 == undefined){
+                NovadolMonth_2 = 0;
+
+            }
+            else{
+                NovadolMonth_2 =NovodolMap_month2.val;
+            }
+            AchievementArrAllProductsMonth_2.push(NovadolMonth_2);
+
+            if(FemiMap_month2 == undefined){
+                FemijectMonth_2 = 0;
+
+            }
+            else{
+                FemijectMonth_2 =FemiMap_month2.val;
+            }
+            AchievementArrAllProductsMonth_2.push(FemijectMonth_2);
+
+            if(NovaMap_month2 == undefined){
+                NovajectMonth_2 = 0;
+
+            }
+            else{
+                NovajectMonth_2 =NovaMap_month2.val;
+            }
+            AchievementArrAllProductsMonth_2.push(NovajectMonth_2);
+            if(DepoMap_month2 ==undefined){
+                DepoMonth_2 = 0;
+
+            }
+            else{
+                DepoMonth_2 =DepoMap_month2.val;
+            }
+            AchievementArrAllProductsMonth_2.push(DepoMonth_2);
+
+
+            if(MultiMap_month2 == undefined){
+                MultiMonth_2 = 0;
+
+            }
+            else{
+                MultiMonth_2 = MultiMap_month2.val;
+            }
+            AchievementArrAllProductsMonth_2.push(MultiMonth_2);
+
+            if(SafeMap_month2 == undefined){
+                SafeMonth_2 = 0;
+
+            }
+            else{
+                SafeMonth_2 = SafeMap_month2.val;
+            }
+            AchievementArrAllProductsMonth_2.push(SafeMonth_2);
+
+
+
+            // size calculation********
+            for(var s=0; s<products.rows.length; s++) {
+                var sizeECP, sizeNovodol, sizeFemi, sizeNova, sizeDepo, sizeMulti, sizesafe;
+                if (products.rows[s][10] == 'E C P') {
+                    if (ECPMap_month1 != undefined) {
+                        sizeECP = ECPMap_month1.size;
+
+                    }
+                    else if (ECPMap_month2 != undefined) {
+                        sizeECP = ECPMap_month2.size;
+
+                    }
+                    else if (ECPMap_month3 != undefined) {
+                        sizeECP = ECPMap_month3.size;
+
+                    }
+                    else if (ECPMap_month1 == undefined && ECPMap_month2 == undefined && ECPMap_month3 == undefined) {
+                        sizeECP = "";
+                    }
+                }
+
+            }
+            for(var s=0; s<products.rows.length; s++) {
+                if (products.rows[s][10] == 'NOVODOL CYCLES') {
+                    if (NovodolMap_month1 != undefined) {
+                        sizeNovodol = NovodolMap_month1.size;
+
+                    }
+                    else if (NovodolMap_month2 != undefined) {
+                        sizeNovodol = NovodolMap_month2.size;
+
+                    }
+                    else if (NovodolMap_month3 != undefined) {
+                        sizeNovodol = NovodolMap_month3.size;
+
+                    }
+                    else if(NovodolMap_month1 == undefined && NovodolMap_month2 ==undefined && NovodolMap_month3==undefined) {
+                        sizeNovodol = "";
+                    }
+
+                }
+            }
+            for(var s=0; s<products.rows.length; s++) {
+                if (products.rows[s][10] == 'FEMIJECT') {
+                    if (FemiMap_month1 != undefined) {
+                        sizeFemi = FemiMap_month1.size;
+
+                    }
+                    else if (FemiMap_month2 != undefined) {
+                        sizeFemi = FemiMap_month2.size;
+
+                    }
+                    else if (FemiMap_month3 != undefined) {
+                        sizeFemi = FemiMap_month3.size;
+
+                    }
+                    else if(FemiMap_month1 == undefined && FemiMap_month2 ==undefined && FemiMap_month3==undefined) {
+                        sizeFemi = "";
+                    }
+
+                }
+
+            }
+            for(var s=0; s<products.rows.length; s++) {
+                if (products.rows[s][10] == 'NOVAJECT') {
+                    if (NovaMap_month1 != undefined) {
+                        sizeNova = NovaMap_month1.size;
+
+                    }
+                    else if (NovaMap_month2 != undefined) {
+                        sizeNova = NovaMap_month2.size;
+
+                    }
+                    else if (NovaMap_month3 != undefined) {
+                        sizeNova = NovaMap_month3.size;
+
+                    }
+                    else if(NovaMap_month1 == undefined && NovaMap_month2 ==undefined && NovaMap_month3==undefined) {
+                        sizeNova = "";
+                    }
+
+                }
+            }
+
+            for(var s=0; s<products.rows.length; s++) {
+                if (products.rows[s][10] == 'DEPO PROVERA') {
+                    if (DepoMap_month1 != undefined) {
+                        sizeDepo = DepoMap_month1.size;
+
+                    }
+                    else if (DepoMap_month2 != undefined) {
+                        sizeDepo = DepoMap_month2.size;
+
+                    }
+                    else if (DepoMap_month3 != undefined) {
+                        sizeDepo = DepoMap_month3.size;
+
+                    }
+                    else if(DepoMap_month1 == undefined && DepoMap_month2 ==undefined && DepoMap_month3==undefined) {
+                        sizeDepo = "";
+                    }
+
+                }
+            }
+
+            for(var s=0; s<products.rows.length; s++) {
+                if (products.rows[s][10] == 'IUD MULTI LOAD') {
+                    if (MultiMap_month1 != undefined) {
+                        sizeMulti = MultiMap_month1.size;
+
+                    }
+                    else if (MultiMap_month2 != undefined) {
+                        sizeMulti = MultiMap_month2.size;
+
+                    }
+                    else if (MultiMap_month3 != undefined) {
+                        sizeMulti = MultiMap_month3.size;
+
+                    }
+                    else if(MultiMap_month1 == undefined && MultiMap_month2 ==undefined && MultiMap_month3==undefined) {
+                        sizeMulti = "";
+                    }
+
+                }
+            }
+            for(var s=0; s<products.rows.length; s++) {
+                if (products.rows[s][10] == 'IUD SAFE LOAD') {
+                    if (SafeMap_month1 != undefined) {
+                        sizesafe = SafeMap_month1.size;
+
+                    }
+                    else if (SafeMap_month2 != undefined) {
+                        sizesafe = SafeMap_month2.size;
+
+                    }
+                    else if (SafeMap_month3 != undefined) {
+                        sizesafe = SafeMap_month3.size;
+
+                    }
+                    else if(SafeMap_month1 == undefined && SafeMap_month2 ==undefined && SafeMap_month3==undefined) {
+                        sizesafe = "";
+                    }
+
+                }
+
+            }
+if(sizeECP ==undefined){
+    sizeECP ="";
+}
+            if(sizeNovodol ==undefined){
+                sizeNovodol ="";
+            }
+            if(sizeFemi ==undefined){
+                sizeFemi ="";
+            }
+            if(sizeNova ==undefined){
+                sizeNova ="";
+            }
+            if(sizeDepo ==undefined){
+                sizeDepo ="";
+            }
+            if(sizeMulti ==undefined){
+                sizeMulti ="";
+            }
+            if(sizesafe ==undefined){
+                sizesafe ="";
+            }
+            size.push(sizeECP);
+            size.push(sizeNovodol);
+            size.push(sizeFemi);
+            size.push(sizeNova);
+            size.push(sizeDepo);
+            size.push(sizeMulti);
+            size.push(sizesafe);
+
+            var prods =["E C P", "NOVODOL CYCLES",  "FEMIJECT", "NOVAJECT", "DEPO PROVERA", "IUD MULTI LOAD", "IUD SAFE LOAD"];
+
+      //    if(products.rows.length > 0) {
+
+
+              for (var t = 0, p = 0; t < products.rows.length, p < prods.length; t++, p++) {
+
+                  //      AchievementArrAllProductsMonth_1 =[], AchievementArrAllProductsMonth_2 =[], AchievementArrAllProductsMonth_3=[];
+
+                  tableDataHtml = tableDataHtml + "<tr><td><center>" + "" + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+
+
+
+                  tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + prods[p] + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + size[p] + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + AchievementArrAllProductsMonth_1[p] + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + AchievementArrAllProductsMonth_2[p] + "</center></td>";
+                  tableDataHtml = tableDataHtml + "<td><center>" + AchievementArrAllProductsMonth_3[p] + "</center></td></tr>";
+                  //  }
+
+              }
+
+        //  }
+
+                $('#datavalue1').append(tableDataHtml);
+                // });
+            });
+     //   });
+        //}
+        //  }
+        // }
+        //   });
+
+        //    });
+        //  });
+
+    }
+    function loadReport() {
+        var htmlReport = "";
+        var selYear = gotPeriod.substring(0, 4);
+        var selMonth = gotPeriod.substring(4, 6);
+
+        //console.log( jsonData1 );
+        $("#" + showingTable + " > thead").html("");
+
+        htmlReport += "<thead><tr bgcolor='#F2DDDC' align='center' height='44'>";
+        // htmlReport += "<td>OrgUnit</td>";
+        $.each(tableDX, function () {
+            htmlReport += "<td>" + this.dxName + "</td>;";
+        });
+        htmlReport += "</tr></thead>";
+
+        $("#" + showingTable + " > tbody").html("");
+        htmlReport += "<tbody>";
+        $.each(orgUnitChildren, function (index1, ou) {
+            htmlReport += "<tr>";
+            htmlReport += "<td align='left'style='padding-left:5px'>" + ou.name + "</td>";
+            $.each(tableDX, function (index2, de) {
+                var temp = getCellValue(jsonData1, de.dxId, ou.id, periodsStr);
+                htmlReport += "<td align='center'>" + temp + "</td>";
+            });
+            htmlReport += "</tr>";
+        });
+        htmlReport += "</tbody>";
+
+        $("#" + showingTable).append(htmlReport);
+        hideLoad();
+    }
+
+    function getCellValue(json, de, ou, periodsStr) {
+        var result = 0;
+        for (var i = 0; i < json.rows.length; i++) {
+            //console.log( json.rows[i][0] + " : " + json.rows[i][1] + " : " + json.rows[i][2] + " : " + json.rows[i][3] );
+            //console.log( de + " : " + ou + " : " + coc );
+            //console.log( "********************************************" );
+            if (json.rows[i][0] == de && json.rows[i][2] == periodsStr && json.rows[i][1] == ou && json.rows[i][3] != null) {
+                result = json.rows[i][3];
+            }
+        }
+        return parseInt(result);
+    }
+
+</script>
+
+<script type="text/javascript" >
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+</script>
+<p><span style="font-size:12px;">
+<style>
+    th {
+        text-align: center;
+    }
+
+    td {
+        padding: 3px 7px;
+
+    }
+
+    .bd {
+        border-style: solid;
+        border-color: #000000;
+    }
+
+    #cover {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 5;
+        width: 100%;
+        height: 100%;
+    }
+
+    #loads {
+        height: 100px;
+        width: 500px;
+        position: fixed;
+        z-index: 10;
+        margin: 0 auto;
+        top: 50%;
+        left: 50%;
+        margin-top: -50px;
+        margin-left: -250px;
+        background: #999;
+        border: 5px solid #cccccc;
+        text-align : center;
+        border-radius: 5px;
+    }
+
+    .loading {
+        width: 400px;
+        font-size: 20px;
+        font-family: verdana;
+        font-weight: bolder;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin: 0 auto;
+        margin-top: -8px;
+        margin-left: -200px;
+    }
+
+
+
+
+</style>
+
+</span></p>
+<table>
+    <tr>
+        <td>
+            <input type="button" id="btnBack" value=" Go to Dashboard"
+                   onclick="location.href='../dhis-web-dashboard-integration/index.action'"/>
+            <input type="button" onclick="printContent('printing');" value="Print"/>
+            <!--<input type="button" id="btnExport" value=" Download Excel " />-->
+
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>Select Date:</td>
+
+
+    </tr>
+    <tr>
+
+        <td><input type="text" id="datepicker"></td>
+        <td><input type="button" onClick="loadDataX()" value="go" style="width:30px"/></td>
+    </tr>
+
+    <tr>
+        <td>Select Region Filter:</td>
+    </tr>
+</table>
+
+<select id="dropregion" >
+    <option selected value="base">Please Select Region</option>
+</select>
+
+</br></br>
+</br></br>
+
+<div id="printing">
+    <table>
+        <tr>
+            <td>
+                <table border="1" cellspacing="6" cellpadding="4" width="100%"
+                       style="border-collapse:collapse; border:2px; font-weight:bolder">
+                    <thead>
+                    <tr align="center" height="27">
+                        <td colspan="30" width="2082" height="27" class="col" bgcolor="#32849C"><font color="white"><b>Customer Scrutiny Report
+                        </b></font></td>
+                    </tr>
+                    <tr bgcolor="#F2DDDC" align="center" height="20">
+                        <td colspan="1" height="20" align="right"><b>Parent OU:</b></td>
+                        <td colspan="2" id="selectedOUName">&nbsp;</td>
+                        <td colspan="5">&nbsp;</td>
+                        <td colspan="1" align="right"><b>Month: </b></td>
+                        <td colspan="2" id="period">&nbsp;</td>
+                    </tr>
+                    </thead>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table id="datavalue1" border="1" cellspacing="6" cellpadding="4" width="100%"
+                       style="border-collapse:collapse; border:2px; font-weight:bolder;
+    border-spacing: 0;">
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
