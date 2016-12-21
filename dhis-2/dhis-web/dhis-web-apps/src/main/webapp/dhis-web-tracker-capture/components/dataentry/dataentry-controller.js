@@ -1,7 +1,7 @@
 /* global angular, trackerCapture */
 
 trackerCapture.controller('DataEntryController',
-        function ($rootScope,associationService,AjaxCalls,
+        function ($rootScope,associationService,AjaxCalls,utilityService,
                 $scope,
                 $modal,
                 $filter,
@@ -28,6 +28,46 @@ trackerCapture.controller('DataEntryController',
                 EventCreationService,
                 MetaDataFactory,
                 $q,$location) {
+
+            const DeMetaAttrCode = "orgUnitGroupSwitch"; // for orgunit group
+            const DeMetaAttrCodeForCategoryOptionGroup ="categoryOptionGroupSwitch";
+
+            AjaxCalls.getOrgUnitGroups().then(function(data){
+                $scope.orgUnitGroups = data.organisationUnitGroups;
+            });
+
+            AjaxCalls.getDes().then(function(des){
+                debugger
+                $scope.deMetaAttrMap = des;
+                $scope.deMetaAttrMapForCatOptionGroup = des;
+
+                for (var key in des.dataElements){
+
+                    var value = utilityService.extractMetaAttributeValue(des.dataElements[key].attributeValues,DeMetaAttrCode);
+                    $scope.deMetaAttrMap[des.dataElements[key].id] = des.dataElements[key];
+
+                    if (value){
+                        $scope.deMetaAttrMap[des.dataElements[key].id][DeMetaAttrCode] = value;
+                        console.log("key-"+key);
+                    }
+                }
+
+                for (var key1 in des.dataElements) {
+                    var value1 = utilityService.extractMetaAttributeValue(des.dataElements[key1].attributeValues, DeMetaAttrCodeForCategoryOptionGroup);
+                    $scope.deMetaAttrMapForCatOptionGroup[des.dataElements[key1].id] = des.dataElements[key1];
+
+                    if (value1) {
+                        $scope.deMetaAttrMapForCatOptionGroup[des.dataElements[key1].id][DeMetaAttrCodeForCategoryOptionGroup] = value1;
+                        console.log("key1--" + key1);
+                    }
+                }
+            });
+
+            AjaxCalls.getCategoryOptionGroups().then(function(data){
+
+                $scope.categoryOptionGroups = data.categoryOptionGroups;
+            });
+
     $scope.printForm = false;
     $scope.printEmptyForm = false;
     $scope.eventPageSize = 4;

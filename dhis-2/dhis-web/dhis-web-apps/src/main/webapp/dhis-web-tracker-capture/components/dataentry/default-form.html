@@ -77,6 +77,7 @@
                         </div>
                     </div>
                     <div ng-if="!prStDe.dataElement.optionSetValue" ng-switch="prStDe.dataElement.valueType">
+
                         <div ng-switch-when="NUMBER">
                             <div class="hideInPrint">
                                 <input type="number"
@@ -185,7 +186,17 @@
                             </div>
                         </div>
                         <div ng-switch-when="TEXT">
+
                             <div class="hideInPrint">
+                                <div ng-if="deMetaAttrMap[prStDe.dataElement.id].orgUnitGroupSwitch == 'true'">
+                                    <select  ng-class="getInputNotifcationClass(prStDe.dataElement.id,false, currentEvent)"
+                                             class="form-control input-with-audit"
+                                             ng-model="currentEvent[prStDe.dataElement.id]"
+                                            ng-options="oug.id as oug.name for oug in orgUnitGroups"
+                                             ng-blur="saveDatavalue(prStDe, innerForm.foo)">
+                                    </select>
+                                </div>
+                                <div ng-if="deMetaAttrMap[prStDe.dataElement.id].orgUnitGroupSwitch == 'false'">
                                 <input type="text"
                                        ng-class="getInputNotifcationClass(prStDe.dataElement.id,false, currentEvent)"
                                        class="form-control input-with-audit"
@@ -194,6 +205,25 @@
                                        ng-disabled="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed || assignedFields[currentEvent.event][prStDe.dataElement.id]"
                                        ng-blur="saveDatavalue(prStDe, innerForm.foo)"
                                        name="foo"/>
+                                </div>
+                                <div ng-if="deMetaAttrMapForCatOptionGroup[prStDe.dataElement.id].categoryOptionGroupSwitch == 'true'">
+                                    <select  ng-class="getInputNotifcationClass(prStDe.dataElement.id,false, currentEvent)"
+                                             class="form-control input-with-audit"
+                                             ng-model="currentEvent[prStDe.dataElement.id]"
+                                             ng-options="cat.id as cat.name for cat in categoryOptionGroups"
+                                             ng-blur="saveDatavalue(prStDe, innerForm.foo)">
+                                    </select>
+                                </div>
+                                <div ng-if="deMetaAttrMapForCatOptionGroup[prStDe.dataElement.id].categoryOptionGroupSwitch == 'false'">
+                                    <input type="text"
+                                           ng-class="getInputNotifcationClass(prStDe.dataElement.id,false, currentEvent)"
+                                           class="form-control input-with-audit"
+                                           ng-model="currentEvent[prStDe.dataElement.id]"
+                                           ng-required={{prStDe.compulsory}}
+                                           ng-disabled="selectedEnrollment.status !== 'ACTIVE' || currentEvent.editingNotAllowed || assignedFields[currentEvent.event][prStDe.dataElement.id]"
+                                           ng-blur="saveDatavalue(prStDe, innerForm.foo)"
+                                           name="foo"/>
+                                </div>
                                 <d2-audit dataelement-id="{{prStDe.dataElement.id}}" dataelement-name="{{prStDe.dataElement.name}}" current-event="{{currentEvent.event}}"></d2-audit>
                             </div>
                             <div class="not-for-screen">
