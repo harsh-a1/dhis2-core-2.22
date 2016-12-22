@@ -73,7 +73,7 @@ trackerCapture
                 return promise;
             },
             getOrgUnitGroups : function(){
-                var promise = $http.get('../api/organisationUnitGroups?fields=id,name&paging=false').then(function (response) {
+                var promise = $http.get('../api/organisationUnitGroups?fields=id,name,attributeValues&paging=false').then(function (response) {
 
                     return response.data;
                 });
@@ -87,7 +87,7 @@ trackerCapture
                 return promise;
             },
             getCategoryOptionGroups : function(){
-                var promise = $http.get("../api/categoryOptionGroups?fields=id,name&paging=false").then(function(response){
+                var promise = $http.get("../api/categoryOptionGroups?fields=id,name,attributeValues&paging=false").then(function(response){
 
                     return response.data;
                 });

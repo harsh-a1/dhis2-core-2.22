@@ -31,9 +31,17 @@ trackerCapture.controller('DataEntryController',
 
             const DeMetaAttrCode = "orgUnitGroupSwitch"; // for orgunit group
             const DeMetaAttrCodeForCategoryOptionGroup ="categoryOptionGroupSwitch";
+            $scope.orgUnitGroups =[];
+            $scope.categoryOptionGroups=[];
 
             AjaxCalls.getOrgUnitGroups().then(function(data){
-                $scope.orgUnitGroups = data.organisationUnitGroups;
+                for(var i=0; i<data.organisationUnitGroups.length; i++) {
+                    if (data.organisationUnitGroups[i].attributeValues.length > 0 && data.organisationUnitGroups[i].attributeValues[0].value == 'true') {
+
+                        $scope.orgUnitGroups.push(data.organisationUnitGroups[i]);
+                    }
+                }
+               // $scope.orgUnitGroups = data.organisationUnitGroups;
             });
 
             AjaxCalls.getDes().then(function(des){
@@ -64,8 +72,15 @@ trackerCapture.controller('DataEntryController',
             });
 
             AjaxCalls.getCategoryOptionGroups().then(function(data){
+                for(var i=0; i<data.categoryOptionGroups.length; i++){
+                    if (data.categoryOptionGroups[i].attributeValues.length > 0 && data.categoryOptionGroups[i].attributeValues[0].value == 'true') {
 
-                $scope.categoryOptionGroups = data.categoryOptionGroups;
+                        $scope.categoryOptionGroups.push(data.categoryOptionGroups[i]);
+                    }
+
+
+                }
+               // $scope.categoryOptionGroups = data.categoryOptionGroups;
             });
 
     $scope.printForm = false;
