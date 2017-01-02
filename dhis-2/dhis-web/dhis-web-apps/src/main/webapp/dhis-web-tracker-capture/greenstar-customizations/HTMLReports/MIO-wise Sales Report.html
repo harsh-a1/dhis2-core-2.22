@@ -7,13 +7,16 @@
     orgUnit.parent = dhis2.report.organisationUnitHierarchy[1];
     var orgUnitChildren = dhis2.report.organisationUnitChildren;
     var orgUnitUIDs = "";
+    var MIOName = [],orgUnitsAssignedToMIO =[];
 
     var prgUID = "TbYUPaBChYR";
     var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
     var tableDataHtml;
+
     var orgnUnit ="tZJsIdHAfKq";
-    var MIOOrgMap = []; var MIOName = [],orgUnitsAssignedToMIO =[],orgUnitsAssignedToMIORegionFilter=[],MIOOrgMapOrgFilter=[], MIOName1=[], MIOName2=[];
+    var MIOOrgMap = []; var orgUnitsAssignedToMIORegionFilter=[],MIOOrgMapOrgFilter=[];
     var stage1 = "DZFh7HUSfum"; var regionorg;
+    var MIOMap =[];
     var stage2 = "ji6F1SNQaqh";
     var stage3 = "j0b0ZKgt8f4";
     var ouGroupOUs =[];
@@ -34,7 +37,7 @@
 
 
     var deUIDs = "";
-
+    var staffcode;
     var url = window.location.href;
     var params = url.split('=');
     var gotPeriod = params[2];
@@ -61,333 +64,27 @@
         $("#workerdropdown").change(function () {
             worker = $(this).find("option:selected").text();
 
-            var Table = document.getElementById("datavalue1");
-            Table.innerHTML = "";
-            var a = document.getElementById('datepicker').value;
-            startDate = a.split("/").reverse().join("");
+            /*  $.get("../api/trackedEntityInstances.json?ou=tZJsIdHAfKq&ouMode=DESCENDANTS&trackedEntity=bktnaUECtSL", function (json) {
+             for(var i=0; i<json.trackedEntityInstances.length; i++) {
+             for (var j = 0; j < json.trackedEntityInstances[i].attributes.length; j++)
+             if (json.trackedEntityInstances[i].attributes[j].code == "Firstname") {
 
-            var periodStr1 = startDate.substring(4, 8);
-            var periodStr2 = startDate.substring(2, 4);
-            var periodStrday = startDate.substring(6, 8);
-            var periodStrmonthly = startDate.substring(0, 6);
+             if (worker == json.trackedEntityInstances[i].attributes[j].value) {
+             for (var k = 0; k < json.trackedEntityInstances[i].attributes.length; k++) {
+             if (json.trackedEntityInstances[i].attributes[k].displayName == 'Staff Code') {
 
-            var month1 =  periodStrmonthly.substring(4);
-            if (month1 == "01" || month1 == "1")        month1 = "January";
-            else if (month1 == "02" || month1 == "2")    month1 = "February";
-            else if (month1 == "03" || month1 == "3")    month1 = "March";
-            else if (month1 == "04" || month1 == "4")    month1 = "April";
-            else if (month1 == "05" || month1 == "5")    month1 = "May";
-            else if (month1 == "06" || month1 == "6")    month1 = "June";
-            else if (month1 == "07" || month1 == "7")    month1 = "July";
-            else if (month1 == "08" || month1 == "8")    month1 = "August";
-            else if (month1 == "09" || month1 == "9")    month1 = "September";
-            else if (month1 == "10")                month1 = "October";
-            else if (month1 == "11")                month1 = "November";
-            else if (month1 == "12")                month1 = "December";
+             staffcode = json.trackedEntityInstances[i].attributes[k].value;
+             break;
+             }
 
-            var SelectedDate = periodStrmonthly.substring(0, 4) + "-" + month1;
+             }
+             }
+             }
+             }*/
 
 
-            var periodStr = startDate;
-            var events = [];
-            document.getElementById('selectedOUName').innerHTML = "Pakistan";
-            document.getElementById('period').innerHTML = SelectedDate;
 
-            def_stage2 = $.Deferred();
-
-            //get MIO and their assigned org unit group
-            $.get("../api/analytics/events/query/yCEiGZVSHP7.json?stage="+stage2+"&dimension=pe:THIS_YEAR&dimension=ou:EaH1MW0W9Ri&dimension=MCJaNkHvR4k&dimension=xrRXoFWyZtL&dimension=W8FmaUeVMFO&dimension=fDiLi3AhLa6&dimension=RUKJoZQYcwI&dimension=vc9Tsy0JhRB&displayProperty=NAME", function (data1) {
-
-                for (var i = 0; i < data1.rows.length; i++) {
-
-                    MIOName.push(data1.rows[i][8]);
-
-                    MIOOrgMap[MIOName] = [data1.rows[i][9], data1.rows[i][10], data1.rows[i][11], data1.rows[i][12], data1.rows[i][13]];
-
-                }
-
-                for (j = 0; j < MIOOrgMap[MIOName].length; j++) {
-                    for (var k = 0; k < MIOOrgMap[MIOName][j].length; k++) {
-
-                        if (MIOOrgMap[MIOName][k] != " ") {
-
-
-                            $.get("../api/organisationUnitGroups/" + MIOOrgMap[MIOName][k] + ".json?fields=organisationUnits[id,name]", function (data3) {
-                                //  def_stage2.resolve("");
-                                for (var l = 0; l < data3.organisationUnits.length; l++) {
-
-                                    orgUnitsAssignedToMIO.push(data3.organisationUnits[l].name);
-
-                                }
-
-                            });
-
-                        }
-                    }
-                }
-
-
-            });
-
-
-
-
-
-            // prepare table header
-            var headerHtml = "<thead  ><tr bgcolor='#F2DDDC' ><th rowspan='2'><center>Territory</center></th>" +
-                            "<th  rowspan='2'><center>MIO Name</center></th>" +
-                            "<th  rowspan='2'><center>Month</center></th>" +
-                            "<th rowspan='2'><center>No of Outlets/Providers</center></th>" +
-                            "<th rowspan='2'><center>Products</center></th>" +
-                            "<th rowspan='2'  bgcolor='#F2DDDC'><center>Targets</center></th>" +
-                            "<th rowspan='2'><center>Achievement</center></th>"+
-                            "<th rowspan='2'  bgcolor='#F2DDDC'><center>%</center></th></tr>"
-
-
-                    ;
-            headerHtml = headerHtml + "</tr></thead>";
-            $('#datavalue1').html("");
-
-            $('#datavalue1').append(headerHtml);
-            //	tableDataHtml="";
-            tableDataHtml = "<tbody>";
-
-            var outletsforECP = 0;
-            var AchievementECP = 0;
-            var AchievementNava = 0;
-            var outletsForNavadol =0;
-            var outletsForFemi =0;
-            var outletsForNovaject = 0, AchievementNovaject= 0, outletsForDepo = 0,AchievementsDepo= 0, outletsForMulti = 0,AchievementMulti = 0, outletsForSafe= 0, AchievementsSafe =0;
-            var PillsCYP = 1, InjCYP= 1, CYPIUCD=1;
-            var AchievementFemi = 0, TotInject= 0, TotIUCD =0 ;
-            var NumOfOutlets, Achievement;
-
-
-            var TotPillsAchievment = 0, TotInjectAcievement = 0, TotIUCDAchievement =0;
-            var PillsCYPAchievement =1, InjCYPAchievement= 1, CYPIUCDAchievement =1;
-
-
-            $.get("../api/analytics/events/query/yCEiGZVSHP7.json?stage="+stage3+"&dimension=pe:"+periodStrmonthly+"&dimension=ou:EaH1MW0W9Ri&dimension=MCJaNkHvR4k&dimension=N4labxVCcQf&dimension=KzJDg9X6uDN&dimension=xIDRqKyNmAr&dimension=hAeErvVxaoN&dimension=bfOO70OOlaY&dimension=d6Ow3V4xjIZ&dimension=I8WoVfOyQQ1&displayProperty=NAME", function(products){
-
-                //  $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage=" + stage1 + "&dimension=pe:" + periodStrmonthly + "&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P&dimension=GlORnHsQGA8&dimension=PMMhhsapMP3&displayProperty=NAME", function (data) {
-                $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage="+stage1+"&dimension=pe:"+periodStrmonthly+"&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P%3BNOVODOL%20CYCLES%3BDEPO%20PROVERA%3BFEMIJECT%3BNOVAJECT%3BIUD%20MULTI%20LOAD%3BIUD%20SAFE%20LOAD&dimension=GlORnHsQGA8&dimension=PMMhhsapMP3&displayProperty=NAME", function (data) {
-
-                    for (k = 0; k < data.rows.length; k++) {
-
-                        if (data.rows[k][8] == 'E C P' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
-
-                            outletsforECP += 1;
-                            AchievementECP += parseInt(data.rows[k][9]);
-                            break;
-                        }
-                        else {
-                            AchievementECP =0;
-                        }
-                    }
-                    for (k = 0; k < data.rows.length; k++) {
-
-                        if (data.rows[k][8] == 'NOVODOL CYCLES' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
-                            outletsForNavadol += 1;
-                            AchievementNava += parseInt(data.rows[k][9]);
-                            break;
-
-                        }
-                        else {
-                            AchievementNava = 0;
-                        }
-                    }
-                    for (k = 0; k < data.rows.length; k++) {
-
-                        if (data.rows[k][8] == 'FEMIJECT' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
-                            outletsForFemi += 1;
-                            AchievementFemi += parseInt(data.rows[k][9]);
-                            break;
-
-                        }
-                        else{
-                            AchievementFemi =0;
-                        }
-                    }
-                    for (k = 0; k < data.rows.length; k++) {
-
-                        if (data.rows[k][8] == 'NOVAJECT' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
-                            outletsForNovaject += 1;
-                            AchievementNovaject += parseInt(data.rows[k][9]);
-                            break;
-
-                        }
-                        else {
-                            AchievementNovaject =0;
-                        }
-                    }
-                    for (k = 0; k < data.rows.length; k++) {
-
-                        if (data.rows[k][8] == 'DEPO PROVERA' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
-                            outletsForDepo += 1;
-                            AchievementsDepo += parseInt(data.rows[k][9]);
-                            break;
-
-                        }
-                        else {
-                            AchievementsDepo = 0;
-                        }
-                    }
-                    for (k = 0; k < data.rows.length; k++) {
-
-                        if (data.rows[k][8] == 'IUD MULTI LOAD' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
-                            outletsForMulti += 1;
-                            AchievementMulti += parseInt(data.rows[k][9]);
-                            break;
-
-                        }
-                        else {
-                            AchievementMulti = 0;
-                        }
-                    }
-                    for (k = 0; k < data.rows.length; k++) {
-
-                        if(data.rows[k][8] == 'IUD SAFE LOAD' && orgUnitsAssignedToMIO.includes(data.rows[k][5])){
-                            outletsForSafe +=1;
-                            AchievementsSafe +=  parseInt(data.rows[k][9]);
-                            break;
-
-                        }
-                        else{
-                            AchievementsSafe =0;
-                        }
-                    }
-
-                    var prodNames =[];
-//                var prodIDs =["N4labxVCcQf","KzJDg9X6uDN"];
-//                for(var pro=0; pro<prodIDs.length; pro++){
-//                    prodNames.push(products.metaData.names[prodIDs[pro]]);
-//
-//                }
-
-                    var prods =["ECP", "Novodol", "Total pills", "Pills CYP", "Femiject", "Novaject", "Depovorvera","Total Inj", "Inj CYP", "Multi Load", "Safe Load", "Total IUDs", "CYP IUDs"];
-
-                    /*   for(var a=0; a<data.rows.length; a++){
-                     var AchievementArray = [];
-                     for(var b=)
-
-                     }*/
-
-                    for(var t=0; t<products.rows.length; t++) {
-                        var newProducts =[];
-                        var AchievementArray = [];
-                        var TotPills =0;
-                        for (var f = 9;f <= 10; f++) {
-                            newProducts.push(products.rows[t][f]);
-                            TotPills += parseInt(products.rows[t][f]);
-                            TotPillsAchievment = parseInt(AchievementECP + AchievementNava);
-                        }
-                        AchievementArray.push(AchievementECP);
-                        AchievementArray.push(AchievementNava);
-                        AchievementArray.push(TotPillsAchievment);
-                        PillsCYP = ((TotPills/15).toFixed(2));
-                        PillsCYPAchievement = ((TotPillsAchievment/15).toFixed(2));
-                        newProducts.push(TotPills);
-                        newProducts.push(PillsCYP);
-                        AchievementArray.push(PillsCYPAchievement);
-                        for (var f = 11;f <= 13; f++) {
-                            newProducts.push(products.rows[t][f]);
-                            TotInject += parseInt(products.rows[t][f]);
-                            TotInjectAcievement = parseInt(AchievementFemi+AchievementNovaject+AchievementsDepo);
-
-                        }
-                        AchievementArray.push(AchievementFemi);
-                        AchievementArray.push(AchievementNovaject);
-                        AchievementArray.push(AchievementsDepo);
-                        AchievementArray.push(TotInjectAcievement);
-                        newProducts.push(TotInject);
-                        InjCYPAchievement = ((AchievementFemi*4)+(AchievementNovaject*6)+(AchievementsDepo*13));
-                        AchievementArray.push(InjCYPAchievement);
-                        InjCYP = ((products.rows[t][11]*4)+(products.rows[t][12]*6)+(products.rows[t][13]*13));
-                        newProducts.push(InjCYP);
-                        for (var f=14;f <= 15; f++) {
-                            newProducts.push(products.rows[t][f]);
-                            TotIUCD +=   parseInt(products.rows[t][f]);
-                            TotIUCDAchievement = parseInt(AchievementMulti+AchievementsSafe);
-
-                        }
-                        newProducts.push(TotIUCD);
-                        CYPIUCDAchievement = ((AchievementMulti*4.6)+(AchievementsSafe*3.3));
-                        AchievementArray.push(AchievementMulti);
-                        AchievementArray.push(AchievementsSafe);
-                        AchievementArray.push(TotIUCDAchievement);
-                        AchievementArray.push(CYPIUCDAchievement);
-                        CYPIUCD  = ((products.rows[t][14]*4.6)+(products.rows[t][15]*3.3));
-                        newProducts.push(CYPIUCD);
-
-                        for (var s = 0, p=0; s < newProducts.length, p<prods.length; s++, p++) {
-
-                            if(products.rows[t][8] ==  worker) {
-                                // tableDataHtml = tableDataHtml + "<tr><td><center>" + regionorgname + "</center></td>";
-                            //    tableDataHtml = tableDataHtml + "<tr><td><center>" + products.rows[t][5] + "</center></td>";
-                                tableDataHtml = tableDataHtml + "<td><center>" + data.rows[0][10] + "</center></td>";
-                                tableDataHtml = tableDataHtml + "<td><center>" + products.rows[t][8] + "</center></td>";
-                                tableDataHtml = tableDataHtml + "<td><center>" + SelectedDate + "</center></td>";
-
-                                if(prods[p] == 'ECP'){
-                                    //Achievement = AchievementECP;
-                                    NumOfOutlets =  outletsforECP;
-
-                                }
-                                else if(prods[p] == 'Novodol'){
-
-                                    //Achievement = AchievementNava;
-                                    NumOfOutlets =  outletsForNavadol;
-
-                                }
-                                else if(prods[p] == 'Femiject'){
-
-                                    // Achievement = AchievementNava;
-                                    NumOfOutlets =  outletsForNavadol;
-                                }
-                                else if(prods[p] == 'Novaject'){
-
-                                    // Achievement = AchievementNovaject;
-                                    NumOfOutlets =  outletsForNovaject;
-                                }
-                                else if(prods[p] == 'Depovorvera'){
-
-                                    //  Achievement = AchievementsDepo;
-                                    NumOfOutlets =  outletsForDepo;
-                                }
-                                else if(prods[p] == 'Multi Load'){
-
-                                    // Achievement = AchievementMulti;
-                                    NumOfOutlets =  outletsForMulti;
-                                }
-                                else if(prods[p] == 'Safe Load'){
-
-                                    //  Achievement = AchievementsSafe;
-                                    NumOfOutlets =  outletsForSafe;
-                                }
-
-                                tableDataHtml = tableDataHtml + "<td><center>" + NumOfOutlets + "</center></td>";
-
-                                if(prods[p] == 'Total pills' || prods[p] == 'Pills CYP' || prods[p] == 'Total Inj' ||prods[p] == 'Inj CYP' || prods[p] == 'Total IUDs' || prods[p] =='CYP IUDs'){
-                                    tableDataHtml = tableDataHtml + "<td style='background-color: lightgray'><center>" + prods[p] + "</center></td>";
-                                }
-                                else{
-                                    tableDataHtml = tableDataHtml + "<td><center>" + prods[p] + "</center></td>";
-                                }
-                                // tableDataHtml = tableDataHtml + "<td><center>" + prods[p] + "</center></td>";
-                                tableDataHtml = tableDataHtml + "<td><center>" + newProducts[s] + "</center></td>";
-                                tableDataHtml = tableDataHtml + "<td><center>" + AchievementArray[s] + "</center></td>";
-                                // tableDataHtml = tableDataHtml + "<td><center>" + (Achievement/parseInt(products.rows[t][s]))*100 + "</center></td></tr>";
-                                tableDataHtml = tableDataHtml + "<td><center>" + Math.round(((AchievementArray[s]) / (newProducts[s])) * 100) + "</center></td></tr>";
-                            }
-
-                        }
-
-                    }
-
-                    $('#datavalue1').append(tableDataHtml);
-                    // });
-                });
-            });
+            //    });
 
 
         })
@@ -411,15 +108,7 @@
             window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#printing').html()));
             e.preventDefault();
         });
-        $.getJSON("../api/organisationUnitGroupSets/MVyDCUdQZ4a.json?fields=organisationUnitGroups[id,name]", function (data) {
-            $.each(data.organisationUnitGroups, function (index, item) {
-                $('#dropregion').append(
-                        $('<option></option>').val(item.id).html(item.name).text(item.name)
-                );
 
-            });
-
-        });
 
 
     });
@@ -431,28 +120,6 @@
         document.getElementsByTagName("body")[0].style.overflow = "scroll";
     }
 
-
-
-    function getPeriod(pr) {
-        var year = pr.substring(0, 4);
-        var month = pr.substring(4, 6);
-        var strMonth = "";
-
-        if (month == "01" || month == "1")        strMonth = "January";
-        else if (month == "02" || month == "2")    strMonth = "February";
-        else if (month == "03" || month == "3")    strMonth = "March";
-        else if (month == "04" || month == "4")    strMonth = "April";
-        else if (month == "05" || month == "5")    strMonth = "May";
-        else if (month == "06" || month == "6")    strMonth = "June";
-        else if (month == "07" || month == "7")    strMonth = "July";
-        else if (month == "08" || month == "8")    strMonth = "August";
-        else if (month == "09" || month == "9")    strMonth = "September";
-        else if (month == "10")                strMonth = "October";
-        else if (month == "11")                strMonth = "November";
-        else if (month == "12")                strMonth = "December";
-
-        return strMonth + " " + year;
-    }
 
     var periodArray = [];
     //  var cYear = parseInt(gotPeriod.substring(0, 4));
@@ -472,10 +139,91 @@
         return map;
     }
 
-    function loadDataX() {
-        //
-        tableDataHtml = "";
 
+    function loadData(){
+        var a = document.getElementById('datepicker').value;
+        startDate = a.split("/").reverse().join("");
+
+        var periodStr1 = startDate.substring(4, 8);
+        var periodStr2 = startDate.substring(2, 4);
+        var periodStrday = startDate.substring(6, 8);
+        var periodStrmonthly = startDate.substring(0, 6);
+
+        var month1 =  periodStrmonthly.substring(4);
+        if (month1 == "01" || month1 == "1")        month1 = "January";
+        else if (month1 == "02" || month1 == "2")    month1 = "February";
+        else if (month1 == "03" || month1 == "3")    month1 = "March";
+        else if (month1 == "04" || month1 == "4")    month1 = "April";
+        else if (month1 == "05" || month1 == "5")    month1 = "May";
+        else if (month1 == "06" || month1 == "6")    month1 = "June";
+        else if (month1 == "07" || month1 == "7")    month1 = "July";
+        else if (month1 == "08" || month1 == "8")    month1 = "August";
+        else if (month1 == "09" || month1 == "9")    month1 = "September";
+        else if (month1 == "10")                month1 = "October";
+        else if (month1 == "11")                month1 = "November";
+        else if (month1 == "12")                month1 = "December";
+
+        var SelectedDate = periodStrmonthly.substring(0, 4) + "-" + month1;
+
+
+        var periodStr = startDate;
+        var events = [];
+        document.getElementById('selectedOUName').innerHTML = "Pakistan";
+        document.getElementById('period').innerHTML = SelectedDate;
+
+        $.get("../api/analytics/events/query/yCEiGZVSHP7.json?stage="+stage2+"&dimension=pe:LAST_YEAR&dimension=ou:tZJsIdHAfKq&dimension=MCJaNkHvR4k&dimension=xrRXoFWyZtL&dimension=W8FmaUeVMFO&dimension=fDiLi3AhLa6&dimension=RUKJoZQYcwI&dimension=vc9Tsy0JhRB&dimension=we5czxoFChc&displayProperty=NAME", function (data1) {
+
+            $.get("../api/analytics/events/query/yCEiGZVSHP7.json?stage="+stage3+"&dimension=pe:"+periodStrmonthly+"&dimension=ou:tZJsIdHAfKq&dimension=MCJaNkHvR4k&dimension=N4labxVCcQf&dimension=KzJDg9X6uDN&dimension=xIDRqKyNmAr&dimension=hAeErvVxaoN&dimension=bfOO70OOlaY&dimension=d6Ow3V4xjIZ&dimension=I8WoVfOyQQ1&dimension=we5czxoFChc&displayProperty=NAME", function(products){
+
+
+                for(var x=0; x<products.rows.length;x++) {
+                    for (var i = 0; i < data1.rows.length; i++) {
+
+                        if ((worker == data1.rows[i][8]) && (data1.rows[i][8] == products.rows[x][8])) {
+                            // MIOName.push(products.rows[x][8]);
+
+                            MIOOrgMap = [data1.rows[i][9], data1.rows[i][10], data1.rows[i][11], data1.rows[i][12], data1.rows[i][13]];
+                        }
+                    }
+                }
+                //  for (var q = 0; q < MIOName.length; q++) {
+                for (var k = 0; k < MIOOrgMap.length; k++) {
+
+                    if (MIOOrgMap[k] != "") {
+
+
+                        $.get("../api/organisationUnitGroups/" + MIOOrgMap[k] + ".json?fields=organisationUnits[id,name]", function (data3) {
+                            //  def_stage2.resolve("");
+                            for (var l = 0; l < data3.organisationUnits.length; l++) {
+                                orgUnitsAssignedToMIO.push(data3.organisationUnits[l].name);
+                                // MIOMap[MIOName[q]]= orgUnitsAssignedToMIO;
+
+                            }
+
+                        });
+
+                    }
+                }
+                //}
+
+                /* for(var q=0; q< MIOName.length; q++){
+                 $.get("../api/sqlViews/QpFhYxcaxhW/data.json?var=staffcode:"+staffcode, function(sql){
+
+
+                 })
+
+                 }*/
+                loadDataX();
+
+
+            });
+
+
+        });
+
+    }
+
+    function loadDataX() {
 
         var a = document.getElementById('datepicker').value;
         startDate = a.split("/").reverse().join("");
@@ -504,52 +252,17 @@
 
         var periodStr = startDate;
         var events = [];
-            document.getElementById('selectedOUName').innerHTML = "Pakistan";
+        document.getElementById('selectedOUName').innerHTML = "Pakistan";
         document.getElementById('period').innerHTML = SelectedDate;
 
-        def_stage2 = $.Deferred();
+        //
+        tableDataHtml = "";
+
+
 
 
         //get MIO and their assigned org unit group
-        $.get("../api/analytics/events/query/yCEiGZVSHP7.json?stage="+stage2+"&dimension=pe:THIS_YEAR&dimension=ou:EaH1MW0W9Ri&dimension=MCJaNkHvR4k&dimension=xrRXoFWyZtL&dimension=W8FmaUeVMFO&dimension=fDiLi3AhLa6&dimension=RUKJoZQYcwI&dimension=vc9Tsy0JhRB&displayProperty=NAME", function (data1) {
 
-
-
-            for (var i = 0; i < data1.rows.length; i++) {
-
-                MIOName.push(data1.rows[i][8]);
-
-                MIOOrgMap[MIOName] = [data1.rows[i][9], data1.rows[i][10], data1.rows[i][11], data1.rows[i][12], data1.rows[i][13]];
-
-            }
-
-            for (j = 0; j < MIOOrgMap[MIOName].length; j++) {
-                for (var k = 0; k < MIOOrgMap[MIOName][j].length; k++) {
-
-                    if (MIOOrgMap[MIOName][k] != " ") {
-
-
-                        $.get("../api/organisationUnitGroups/" + MIOOrgMap[MIOName][k] + ".json?fields=organisationUnits[id,name]", function (data3) {
-                            //  def_stage2.resolve("");
-                            for (var l = 0; l < data3.organisationUnits.length; l++) {
-
-                                orgUnitsAssignedToMIO.push(data3.organisationUnits[l].name);
-
-                            }
-
-                        });
-
-                    }
-                }
-            }
-            //     def_stage2.resolve("");
-
-            //  return def_stage2.promise();
-
-        });
-
-
-        //       });
 
 
 
@@ -588,52 +301,54 @@
         var PillsCYPAchievement =1, InjCYPAchievement= 1, CYPIUCDAchievement =1;
 
 
-        $.get("../api/analytics/events/query/yCEiGZVSHP7.json?stage="+stage3+"&dimension=pe:"+periodStrmonthly+"&dimension=ou:EaH1MW0W9Ri&dimension=MCJaNkHvR4k&dimension=N4labxVCcQf&dimension=KzJDg9X6uDN&dimension=xIDRqKyNmAr&dimension=hAeErvVxaoN&dimension=bfOO70OOlaY&dimension=d6Ow3V4xjIZ&dimension=I8WoVfOyQQ1&displayProperty=NAME", function(products){
+        $.get("../api/analytics/events/query/yCEiGZVSHP7.json?stage="+stage3+"&dimension=pe:"+periodStrmonthly+"&dimension=ou:tZJsIdHAfKq&dimension=MCJaNkHvR4k&dimension=N4labxVCcQf&dimension=KzJDg9X6uDN&dimension=xIDRqKyNmAr&dimension=hAeErvVxaoN&dimension=bfOO70OOlaY&dimension=d6Ow3V4xjIZ&dimension=I8WoVfOyQQ1&displayProperty=NAME", function(products){
 
-            //  $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage=" + stage1 + "&dimension=pe:" + periodStrmonthly + "&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P&dimension=GlORnHsQGA8&dimension=PMMhhsapMP3&displayProperty=NAME", function (data) {
-            $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage="+stage1+"&dimension=pe:"+periodStrmonthly+"&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P%3BNOVODOL%20CYCLES%3BDEPO%20PROVERA%3BFEMIJECT%3BNOVAJECT%3BIUD%20MULTI%20LOAD%3BIUD%20SAFE%20LOAD&dimension=GlORnHsQGA8&dimension=PMMhhsapMP3&displayProperty=NAME", function (data) {
+            $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage="+stage1+"&dimension=pe:"+periodStrmonthly+"&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P%3BNOVODOL%20CYCLES%3BDEPO%20PROVERA%3BFEMIJECT%3BNOVAJECT%3BIUD%20MULTI%20LOAD%3BIUD%20SAFE%20LOAD&dimension=GlORnHsQGA8&dimension=PMMhhsapMP3&displayProperty=NAME&desc=EVENTDATE", function (data) {
+                var index =0;
 
-                for (k = 0; k < data.rows.length; k++) {
 
-                    if (data.rows[k][8] == 'E C P' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
+
+                for (var z = 0; z < data.rows.length; z++) {
+
+                    if (data.rows[z][8] == 'E C P' && orgUnitsAssignedToMIO.includes(data.rows[z][5])) {
 
                         outletsforECP += 1;
-                        AchievementECP += parseInt(data.rows[k][9]);
-                        break;
+                        AchievementECP += parseInt(data.rows[z][9]);
+                        //   break;  //  will take only first E C P-- most Recent
                     }
-                    else {
-                        AchievementECP =0;
-                    }
+                    /*  else {
+                     AchievementECP =0;
+                     }*/
                 }
-                for (k = 0; k < data.rows.length; k++) {
+                for (var a = 0; a < data.rows.length; a++) {
 
-                    if (data.rows[k][8] == 'NOVODOL CYCLES' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
+                    if (data.rows[a][8] == 'NOVODOL CYCLES' && orgUnitsAssignedToMIO.includes(data.rows[a][5])) {
                         outletsForNavadol += 1;
-                        AchievementNava += parseInt(data.rows[k][9]);
-                        break;
+                        AchievementNava += parseInt(data.rows[a][9]);
+                        // break;
 
                     }
-                    else {
-                        AchievementNava = 0;
-                    }
+                    /*  else {
+                     AchievementNava = 0;
+                     }*/
                 }
-                for (k = 0; k < data.rows.length; k++) {
+                for (var b = 0; b < data.rows.length; b++) {
 
-                    if (data.rows[k][8] == 'FEMIJECT' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
+                    if (data.rows[b][8] == 'FEMIJECT' && orgUnitsAssignedToMIO.includes(data.rows[b][5])) {
                         outletsForFemi += 1;
-                        AchievementFemi += parseInt(data.rows[k][9]);
-                        break;
+                        AchievementFemi += parseInt(data.rows[b][9]);
+                        //  break;
 
                     }
-                    else{
-                        AchievementFemi =0;
-                    }
+                    /*  else{
+                     AchievementFemi =0;
+                     }*/
                 }
-                for (k = 0; k < data.rows.length; k++) {
+                for (var c = 0; c < data.rows.length; c++) {
 
-                    if (data.rows[k][8] == 'NOVAJECT' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
+                    if (data.rows[c][8] == 'NOVAJECT' && orgUnitsAssignedToMIO.includes(data.rows[c][5])) {
                         outletsForNovaject += 1;
-                        AchievementNovaject += parseInt(data.rows[k][9]);
+                        AchievementNovaject += parseInt(data.rows[c][9]);
                         break;
 
                     }
@@ -641,41 +356,41 @@
                         AchievementNovaject =0;
                     }
                 }
-                for (k = 0; k < data.rows.length; k++) {
+                for (var d = 0; d < data.rows.length; d++) {
 
-                    if (data.rows[k][8] == 'DEPO PROVERA' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
+                    if (data.rows[d][8] == 'DEPO PROVERA' && orgUnitsAssignedToMIO.includes(data.rows[d][5])) {
                         outletsForDepo += 1;
-                        AchievementsDepo += parseInt(data.rows[k][9]);
-                        break;
+                        AchievementsDepo += parseInt(data.rows[d][9]);
+                        //   break;
 
                     }
-                    else {
-                        AchievementsDepo = 0;
-                    }
+                    /*else {
+                     AchievementsDepo = 0;
+                     }*/
                 }
-                for (k = 0; k < data.rows.length; k++) {
+                for (var e= 0; e < data.rows.length; e++) {
 
-                    if (data.rows[k][8] == 'IUD MULTI LOAD' && orgUnitsAssignedToMIO.includes(data.rows[k][5])) {
+                    if (data.rows[e][8] == 'IUD MULTI LOAD' && orgUnitsAssignedToMIO.includes(data.rows[e][5])) {
                         outletsForMulti += 1;
-                        AchievementMulti += parseInt(data.rows[k][9]);
-                        break;
+                        AchievementMulti += parseInt(data.rows[e][9]);
+                        // break;
 
                     }
-                    else {
-                        AchievementMulti = 0;
-                    }
+                    /* else {
+                     AchievementMulti = 0;
+                     }*/
                 }
-                for (k = 0; k < data.rows.length; k++) {
+                for (var f = 0; f < data.rows.length; f++) {
 
-                    if(data.rows[k][8] == 'IUD SAFE LOAD' && orgUnitsAssignedToMIO.includes(data.rows[k][5])){
+                    if(data.rows[f][8] == 'IUD SAFE LOAD' && orgUnitsAssignedToMIO.includes(data.rows[f][5])){
                         outletsForSafe +=1;
-                        AchievementsSafe +=  parseInt(data.rows[k][9]);
-                        break;
+                        AchievementsSafe +=  parseInt(data.rows[f][9]);
+                        //break;
 
                     }
-                    else{
-                        AchievementsSafe =0;
-                    }
+                    /* else{
+                     AchievementsSafe =0;
+                     }*/
                 }
 
                 var prodNames =[];
@@ -694,118 +409,129 @@
                  }*/
 
                 for(var t=0; t<products.rows.length; t++) {
-                    var newProducts =[];
-                    var AchievementArray = [];
-                    var TotPills =0;
-                    for (var f = 9;f <= 10; f++) {
-                        newProducts.push(products.rows[t][f]);
-                        TotPills += parseInt(products.rows[t][f]);
-                        TotPillsAchievment = parseInt(AchievementECP + AchievementNava);
+                    var pos1 = 0;
+                    if (products.rows[t][8] == worker) {
+
+                        pos1 = t;
+                        break;
                     }
-                    AchievementArray.push(AchievementECP);
-                    AchievementArray.push(AchievementNava);
-                    AchievementArray.push(TotPillsAchievment);
-                    PillsCYP = ((TotPills/15).toFixed(2));
-                    PillsCYPAchievement = ((TotPillsAchievment/15).toFixed(2));
-                    newProducts.push(TotPills);
-                    newProducts.push(PillsCYP);
-                    AchievementArray.push(PillsCYPAchievement);
-                    for (var f = 11;f <= 13; f++) {
-                        newProducts.push(products.rows[t][f]);
-                        TotInject += parseInt(products.rows[t][f]);
-                        TotInjectAcievement = parseInt(AchievementFemi+AchievementNovaject+AchievementsDepo);
+                }
+                //  for(var t=0; t<products.rows.length; t++) {
 
-                    }
-                    AchievementArray.push(AchievementFemi);
-                    AchievementArray.push(AchievementNovaject);
-                    AchievementArray.push(AchievementsDepo);
-                    AchievementArray.push(TotInjectAcievement);
-                    newProducts.push(TotInject);
-                    InjCYPAchievement = ((AchievementFemi*4)+(AchievementNovaject*6)+(AchievementsDepo*13));
-                    AchievementArray.push(InjCYPAchievement);
-                    InjCYP = ((products.rows[t][11]*4)+(products.rows[t][12]*6)+(products.rows[t][13]*13));
-                    newProducts.push(InjCYP);
-                    for (var f=14;f <= 15; f++) {
-                        newProducts.push(products.rows[t][f]);
-                        TotIUCD +=   parseInt(products.rows[t][f]);
-                        TotIUCDAchievement = parseInt(AchievementMulti+AchievementsSafe);
 
-                    }
-                    newProducts.push(TotIUCD);
-                    CYPIUCDAchievement = ((AchievementMulti*4.6)+(AchievementsSafe*3.3));
-                    AchievementArray.push(AchievementMulti);
-                    AchievementArray.push(AchievementsSafe);
-                    AchievementArray.push(TotIUCDAchievement);
-                    AchievementArray.push(CYPIUCDAchievement);
-                    CYPIUCD  = ((products.rows[t][14]*4.6)+(products.rows[t][15]*3.3));
-                    newProducts.push(CYPIUCD);
+                var newProducts = [];
+                var AchievementArray = [];
+                var TotPills = 0;
+                for (var f = 9; f <= 10; f++) {
+                    newProducts.push(products.rows[pos1][f]);
+                    TotPills += parseInt(products.rows[pos1][f]);
+                    TotPillsAchievment = parseInt(AchievementECP + AchievementNava);
+                }
+                AchievementArray.push(AchievementECP);
+                AchievementArray.push(AchievementNava);
+                AchievementArray.push(TotPillsAchievment);
+                PillsCYP = ((TotPills / 15).toFixed(2));
+                PillsCYPAchievement = ((TotPillsAchievment / 15).toFixed(2));
+                newProducts.push(TotPills);
+                newProducts.push(PillsCYP);
+                AchievementArray.push(PillsCYPAchievement);
+                for (var f = 11; f <= 13; f++) {
+                    newProducts.push(products.rows[pos1][f]);
+                    TotInject += parseInt(products.rows[pos1][f]);
+                    TotInjectAcievement = parseInt(AchievementFemi + AchievementNovaject + AchievementsDepo);
 
-                    for (var s = 0, p=0; s < newProducts.length, p<prods.length; s++, p++) {
+                }
+                AchievementArray.push(AchievementFemi);
+                AchievementArray.push(AchievementNovaject);
+                AchievementArray.push(AchievementsDepo);
+                AchievementArray.push(TotInjectAcievement);
+                newProducts.push(TotInject);
+                InjCYPAchievement = ((AchievementFemi * 4) + (AchievementNovaject * 6) + (AchievementsDepo * 13));
+                AchievementArray.push(InjCYPAchievement);
+                InjCYP = ((products.rows[pos1][11] * 4) + (products.rows[pos1][12] * 6) + (products.rows[pos1][13] * 13));
+                newProducts.push(InjCYP);
+                for (var f = 14; f <= 15; f++) {
+                    newProducts.push(products.rows[pos1][f]);
+                    TotIUCD += parseInt(products.rows[pos1][f]);
+                    TotIUCDAchievement = parseInt(AchievementMulti + AchievementsSafe);
 
-                        //  if(products.rows[t][8] ==  worker) {
-                        // tableDataHtml = tableDataHtml + "<tr><td><center>" + regionorgname + "</center></td>";
-                     //   tableDataHtml = tableDataHtml + "<tr><td><center>" + products.rows[t][5] + "</center></td>";
-                        tableDataHtml = tableDataHtml + "<td><center>" + data.rows[0][10] + "</center></td>";
-                        tableDataHtml = tableDataHtml + "<td><center>" + products.rows[t][8] + "</center></td>";
-                        tableDataHtml = tableDataHtml + "<td><center>" + SelectedDate + "</center></td>";
+                }
+                newProducts.push(TotIUCD);
+                CYPIUCDAchievement = ((AchievementMulti * 4.6) + (AchievementsSafe * 3.3));
+                AchievementArray.push(AchievementMulti);
+                AchievementArray.push(AchievementsSafe);
+                AchievementArray.push(TotIUCDAchievement);
+                AchievementArray.push(CYPIUCDAchievement);
+                CYPIUCD = ((products.rows[pos1][14] * 4.6) + (products.rows[pos1][15] * 3.3));
+                newProducts.push(CYPIUCD);
 
-                        if(prods[p] == 'ECP'){
-                            //Achievement = AchievementECP;
-                            NumOfOutlets =  outletsforECP;
+                for (var s = 0, p=0; s < newProducts.length, p<prods.length; s++, p++) {
 
-                        }
-                        else if(prods[p] == 'Novodol'){
+                    //  if(products.rows[t][8] ==  worker) {
+                    // tableDataHtml = tableDataHtml + "<tr><td><center>" + regionorgname + "</center></td>";
+                    //   tableDataHtml = tableDataHtml + "<tr><td><center>" + products.rows[t][5] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + data.rows[0][10] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + products.rows[t][8] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + SelectedDate + "</center></td>";
 
-                            //Achievement = AchievementNava;
-                            NumOfOutlets =  outletsForNavadol;
-
-                        }
-                        else if(prods[p] == 'Femiject'){
-
-                            // Achievement = AchievementNava;
-                            NumOfOutlets =  outletsForNavadol;
-                        }
-                        else if(prods[p] == 'Novaject'){
-
-                            // Achievement = AchievementNovaject;
-                            NumOfOutlets =  outletsForNovaject;
-                        }
-                        else if(prods[p] == 'Depovorvera'){
-
-                            //  Achievement = AchievementsDepo;
-                            NumOfOutlets =  outletsForDepo;
-                        }
-                        else if(prods[p] == 'Multi Load'){
-
-                            // Achievement = AchievementMulti;
-                            NumOfOutlets =  outletsForMulti;
-                        }
-                        else if(prods[p] == 'Safe Load'){
-
-                            //  Achievement = AchievementsSafe;
-                            NumOfOutlets =  outletsForSafe;
-                        }
-
-                        tableDataHtml = tableDataHtml + "<td><center>" + NumOfOutlets + "</center></td>";
-
-                        if(prods[p] == 'Total pills' || prods[p] == 'Pills CYP' || prods[p] == 'Total Inj' ||prods[p] == 'Inj CYP' || prods[p] == 'Total IUDs' || prods[p] =='CYP IUDs'){
-                            tableDataHtml = tableDataHtml + "<td style='background-color: lightgray'><center>" + prods[p] + "</center></td>";
-                        }
-                        else{
-                            tableDataHtml = tableDataHtml + "<td><center>" + prods[p] + "</center></td>";
-                        }
-                        // tableDataHtml = tableDataHtml + "<td><center>" + prods[p] + "</center></td>";
-                        tableDataHtml = tableDataHtml + "<td><center>" + newProducts[s] + "</center></td>";
-                        tableDataHtml = tableDataHtml + "<td><center>" + AchievementArray[s] + "</center></td>";
-                        // tableDataHtml = tableDataHtml + "<td><center>" + (Achievement/parseInt(products.rows[t][s]))*100 + "</center></td></tr>";
-                        tableDataHtml = tableDataHtml + "<td><center>" + Math.round(((AchievementArray[s]) / (newProducts[s])) * 100) + "</center></td></tr>";
-                        //  }
+                    if(prods[p] == 'ECP'){
+                        //Achievement = AchievementECP;
+                        NumOfOutlets =  outletsforECP;
 
                     }
+                    else if(prods[p] == 'Novodol'){
+
+                        //Achievement = AchievementNava;
+                        NumOfOutlets =  outletsForNavadol;
+
+                    }
+                    else if(prods[p] == 'Femiject'){
+
+                        // Achievement = AchievementNava;
+                        NumOfOutlets =  outletsForNavadol;
+                    }
+                    else if(prods[p] == 'Novaject'){
+
+                        // Achievement = AchievementNovaject;
+                        NumOfOutlets =  outletsForNovaject;
+                    }
+                    else if(prods[p] == 'Depovorvera'){
+
+                        //  Achievement = AchievementsDepo;
+                        NumOfOutlets =  outletsForDepo;
+                    }
+                    else if(prods[p] == 'Multi Load'){
+
+                        // Achievement = AchievementMulti;
+                        NumOfOutlets =  outletsForMulti;
+                    }
+                    else if(prods[p] == 'Safe Load'){
+
+                        //  Achievement = AchievementsSafe;
+                        NumOfOutlets =  outletsForSafe;
+                    }
+
+                    tableDataHtml = tableDataHtml + "<td><center>" + NumOfOutlets + "</center></td>";
+
+                    if(prods[p] == 'Total pills' || prods[p] == 'Pills CYP' || prods[p] == 'Total Inj' ||prods[p] == 'Inj CYP' || prods[p] == 'Total IUDs' || prods[p] =='CYP IUDs'){
+                        tableDataHtml = tableDataHtml + "<td style='background-color: lightgray'><center>" + prods[p] + "</center></td>";
+                    }
+                    else{
+                        tableDataHtml = tableDataHtml + "<td><center>" + prods[p] + "</center></td>";
+                    }
+                    // tableDataHtml = tableDataHtml + "<td><center>" + prods[p] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + newProducts[s] + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + AchievementArray[s] + "</center></td>";
+                    // tableDataHtml = tableDataHtml + "<td><center>" + (Achievement/parseInt(products.rows[t][s]))*100 + "</center></td></tr>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + Math.round(((AchievementArray[s]) / (newProducts[s])) * 100) + "</center></td></tr>";
+                    //  }
 
                 }
 
+                //  }
+
                 $('#datavalue1').append(tableDataHtml);
+
                 // });
             });
         });
@@ -955,20 +681,22 @@
     <tr>
         <td><input type="text" id="datepicker"></td>
         <!--<td><select id="dropregion" >-->
-            <!--<option value="" disabled selected hidden>Please Select</option>-->
+        <!--<option value="" disabled selected hidden>Please Select</option>-->
         <!--</select></td>-->
-        <td><input type="button" onClick="loadDataX()" value="go" style="width:30px"/></td>
     </tr>
 
     <tr>
         <td>Select MIO Filter:</td>
     </tr>
+
 </table>
 
 <select id="workerdropdown" style="margin-left:0.5%; margin-top:10px ">
     <option selected value="base">Please Select MIO</option>
 </select>
 </br></br>
+<td><input type="button" onClick="loadData()" value="go" style="width:30px"/></td>
+
 </br></br>
 
 <div id="printing">
