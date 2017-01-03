@@ -1,0 +1,833 @@
+<script type="text/javascript"  async>
+
+
+    var ecptarget= 0,novotarget=0,depovorveratarget= 0,multiloadtarget= 0,novajecttarget= 0,safeloadtarget= 0,femijecttarget= 0,touchcondomstarget=0,sathiconsomstarget=0;
+    var periods = dhis2.report.periods;
+	var mediname;
+    var period = periods[0];
+    var orgUnit = dhis2.report.organisationUnit;
+    orgUnit.parent = dhis2.report.organisationUnitHierarchy[1];
+    var orgUnitChildren = dhis2.report.organisationUnitChildren;
+    var orgUnitUIDs = "";
+var targettodate;
+    var ecpoutlets=0,novooutlets= 0,multilaodoutlets= 0,novajectoutlets= 0,safeloadoutlets= 0,femijectoutlets= 0,touchcondomoutlets= 0,sathicondomoutlets=0;
+var ecpachievements=0,novoachievement=0;
+var touchachievement=0;
+    var depoachievement=0,novodol3packachievement= 0,multiloadacheivement= 0,novajectacheivement= 0,safeloadacheivement= 0,femijectacheivement= 0,touchcondomacheivement= 0,sathicondomacheivement=0;
+var achievement=0;
+    var ecpachievementsR= 0,novoachievementR= 0,novodol3packachievementR=0,multiloadacheivementR= 0,novajectacheivementR= 0,safeloadacheivementR= 0,femijectacheivementR= 0,touchcondomacheivementR= 0,sathicondomacheivementR=0;
+    var depoachievementR=0;
+    var region;
+var outlets,achievement,target;
+    var new_providerid ="L0bSL88vvdz";
+    var old_providerid= "ndf6du48Fy5";
+var regionorg="";
+    var regionorgname;
+ var depooutlets=0;
+ var novodol3packsoutlets=0;
+ var touchoutlets=0;
+        var novooutlets=0;
+    var team="";
+    var prgUID = "TbYUPaBChYR";
+    var def_stage1,def_stage2,def_stage3,def_stage4,def_stage5;
+    var tableDataHtml;
+    var stage1 ="mDwBhWDmLfr";
+    var stage2 ="hVVdocIy72g";
+    var stage3="OMHUToxZR03";
+    var stage4 = "k7gHjJ4LFOU";
+    var stage5 ="n2CFuvwUvnh";
+    var orgnUnit ="tZJsIdHAfKq";
+
+
+    if (jQuery.when.all === undefined) {
+        jQuery.when.all = function (deferreds) {
+            var deferred = new jQuery.Deferred();
+            $.when.apply(jQuery, deferreds).then(
+                    function () {
+                        deferred.resolve(Array.prototype.slice.call(arguments));
+                    },
+                    function () {
+                        deferred.fail(Array.prototype.slice.call(arguments));
+                    });
+
+            return deferred;
+        }
+    }
+
+
+    var deUIDs = "";
+
+    var url = window.location.href;
+    var params = url.split('=');
+    var gotPeriod = params[2];
+    var showingTable = "datavalue1";
+
+    jQuery(document).ready(function () {
+
+
+
+        //validateReport();
+        $(".hideInPrint").hide();
+        orgUnitChildren.sort(function (a, b) {
+            if (a.name < b.name)
+                return -1;
+            if (a.name > b.name)
+                return 1;
+            return 0;
+        });
+
+
+        //    loadDataX();
+        $("#datepicker").datepicker({dateFormat: "dd/mm/yy"});
+        $("#datepicker1").datepicker({dateFormat: "dd/mm/yy"});
+
+
+        $("#btnExport").click(function (e) {
+            window.open('data:application/vnd.ms-excel,' + encodeURIComponent($('#printing').html()));
+            e.preventDefault();
+        });
+        $.getJSON("../api/organisationUnitGroupSets/MVyDCUdQZ4a.json?fields=organisationUnitGroups[id,name]", function (data) {
+            $.each(data.organisationUnitGroups, function (index, item) {
+                $('#dropregion').append(
+                        $('<option></option>').val(item.id).html(item.name).text(item.name)
+                );
+
+            });
+
+        });
+        $("#dropregion").change(function () {
+         regionorg=dropregion.value;
+
+               regionorgname = $(this).find("option:selected").text();
+            //  regionorgname=dropregion.value;
+
+//            regionorgname=dropregion.html;
+//            regionorgname=dropregion.text;
+
+        });
+
+    });
+
+
+    function hideLoad() {
+        document.getElementById("cover").style.display = "none";
+        document.getElementById("loads").style.display = "none";
+        document.getElementById("loading").style.display = "none";
+        document.getElementsByTagName("body")[0].style.overflow = "scroll";
+    }
+
+    function validateReport() {
+        $.get("../api/organisationUnitGroups/hdvIWjIWixd?filter=organisationUnits.id:eq:" + orgUnit.id, function (json) {
+
+            if (!json.name) {
+                alert("Selected Facility is not in Intervention OU Group");
+                window.history.back();
+            }
+            else {
+                loadData();
+            }
+        });
+    }
+
+
+    function getPeriod(pr) {
+        var year = pr.substring(0, 4);
+        var month = pr.substring(4, 6);
+        var strMonth = "";
+
+        if (month == "01" || month == "1")        strMonth = "January";
+        else if (month == "02" || month == "2")    strMonth = "February";
+        else if (month == "03" || month == "3")    strMonth = "March";
+        else if (month == "04" || month == "4")    strMonth = "April";
+        else if (month == "05" || month == "5")    strMonth = "May";
+        else if (month == "06" || month == "6")    strMonth = "June";
+        else if (month == "07" || month == "7")    strMonth = "July";
+        else if (month == "08" || month == "8")    strMonth = "August";
+        else if (month == "09" || month == "9")    strMonth = "September";
+        else if (month == "10")                strMonth = "October";
+        else if (month == "11")                strMonth = "November";
+        else if (month == "12")                strMonth = "December";
+
+        return strMonth + " " + year;
+    }
+
+    var periodArray = [];
+    //  var cYear = parseInt(gotPeriod.substring(0, 4));
+    // var cMonth = parseInt(gotPeriod.substring(4, 6));
+    //  var periodsStr = gotPeriod.substring(0, 4) + "" + gotPeriod.substring(4, 6);
+
+    var jsonData1;
+    var jsonData2;
+    var jsonData3;
+    var c = 0;
+
+    function loadData() {
+        document.getElementById('selectedOUName').innerHTML = orgUnit.name;
+        document.getElementById('period').innerHTML = getPeriod(gotPeriod);
+
+        //http://localhost:8090/dhis221/api/analytics.json?dimension=pe:THIS_MONTH&dimension=dx:fftwX6D3iuI;vMISOrzIDPL;Y3sftYIwjSx;Nr8JvumTkmZ;lO9hVUqHo9v;xi0iWC3fLH5;XWBvNBGaek0;xJbKdiq41l3&dimension=ou:Xyeh1Hkiz0i;IsDCrC4yKIB;VKvtcjd4XC3;R0DM4NKU4iX;gXg0zlcO1Xt;EjHkVXiw2tR;b0rHfpNxUUm;zUGO5Ho7Aqb&program=icAx8KDM1WT
+        var url = "../api/analytics.json?dimension=dx:" + deUIDs + "&dimension=ou:" + orgUnitUIDs + "&dimension=pe:" + periodsStr + "&program=" + prgUID;
+
+        console.log(url);
+        $.get(url, function (json) {
+
+
+            console.log("************************URL: " + url);
+
+            jsonData1 = json;
+            //console.log( jsonData1 );
+
+            loadReport();
+        });
+
+    }
+
+    function prepareIdToObjectMap(object, id) {
+        var map = [];
+        for (var i = 0; i < object.length; i++) {
+            map[object[i][id]] = object[i];
+        }
+        return map;
+    }
+
+    function loadDataX() {
+        //
+        tableDataHtml="";
+        achievement="";
+        outlets="";
+        team="";
+        target="";
+        mediname="";
+        targettodate="";
+        var productfound="false";
+        var a = document.getElementById('datepicker').value;
+        var b = document.getElementById('datepicker1').value;
+
+        startDate = a.split("/").reverse().join("-");
+        endDate = b.split("/").reverse().join("-");
+
+        var periodStr1 = startDate.substring(4, 8);
+        var periodStryear = startDate.substring(0, 4);
+        var periodStr2 = startDate.substring(2, 4);
+
+        var targetdate=a.split("/").reverse().join("");
+        var targetenddate=b.split("/").reverse().join("");
+        var periodStrmonthly = targetdate.substring(0, 6);
+        var periodStrday = targetenddate.substring(6, 8);
+//        var periodStr = periodStrmonthly;
+        var periodStr = startDate;
+        var periodendDate = endDate;
+
+        console.log(periodStr);
+        var events = [];
+        document.getElementById('selectedOUName').innerHTML = orgUnit.name;
+        document.getElementById('period').innerHTML = periodStr;
+
+        // prepare table header
+        var headerHtml =  "<thead  ><tr bgcolor='#F2DDDC' ><th rowspan='2'><center>Region</center></th>" +
+                "<th rowspan='2'><center>Team</center></th>"+
+                "<th  rowspan='2'><center>PHARMA + FMCG DESCRIPTION</center></th>" +
+                        "<th rowspan='2'><center>No: of Outlets</center></th>" +
+                        "<th rowspan='2'><center>Targets</center></th>"+
+                        "<th rowspan='2'  bgcolor='#F2DDDC'><center>Targets Todate</center></th>"+
+                        "<th rowspan='2'><center>Achievement</center></th>"+
+                        "<th rowspan='2'  bgcolor='#F2DDDC'><center>Achievement To date</center></th></tr>"
+
+
+                ;
+
+        headerHtml = headerHtml + "</tr></thead>";
+        $('#datavalue1').html("");
+
+        $('#datavalue1').append(headerHtml);
+        //	tableDataHtml="";
+        tableDataHtml = "<tbody><tr>";
+        // data for neighbourhood meeting
+        var stage1="DZFh7HUSfum";
+		
+       // $.get("../api/analytics/events/query/DLC3sZA9asA.json?stage=DZFh7HUSfum&dimension=pe:201607&dimension=ou:tZJsIdHAfKq&dimension=ca8KFIqeM4o:IN%3AE%20C%20P%3BNOVODOL%20CYCLES&dimension=GlORnHsQGA8&displayProperty=NAME",function(data){
+        //$.get("../api/analytics/events/aggregate/DLC3sZA9asA.json?stage=DZFh7HUSfum&dimension=ou:tZJsIdHAfKq&dimension=pe:201607&dimension=ca8KFIqeM4o:IN%3AE%20C%20P%3BNOVODOL%20CYCLES&dimension=GlORnHsQGA8&outputType=EVENT&displayProperty=NAME",function(data){
+
+//        $.get("../api/dataValueSets.json?dataSet=EFzXFh1BQPN&period="+periodStrmonthly+"&orgUnit=T1zuXffdxio",function(data){
+//
+//            for(var i=0;i<data.dataValues.length;i++)
+//            {
+//                if(data.dataValues[i].dataElement=="N4labxVCcQf")
+//                {
+//
+//                    ecptarget=Number(data.dataValues[i].value);
+//
+//                }
+//                else if(data.dataValues[i].dataElement=="KzJDg9X6uDN")
+//                {
+//                    novotarget=Number(data.dataValues[i].value);
+//
+//                }
+//
+//
+//            }
+//        });
+
+//http://125.209.94.74:8080/greenstar/api/analytics/events/query/yCEiGZVSHP7.json?stage=j0b0ZKgt8f4&dimension=pe:LAST_MONTH&dimension=ou:EaH1MW0W9Ri&dimension=MCJaNkHvR4k&dimension=N4labxVCcQf&dimension=KzJDg9X6uDN&dimension=bfOO70OOlaY&dimension=xIDRqKyNmAr&dimension=d6Ow3V4xjIZ&dimension=hAeErvVxaoN&dimension=I8WoVfOyQQ1&displayProperty=NAME
+
+        $.ajax({
+            async : false,
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            header : header,
+            url: '../api/analytics/events/query/yCEiGZVSHP7.json?stage=j0b0ZKgt8f4&dimension=ou:OU_GROUP-OEhAMm4dG0o;tZJsIdHAfKq&dimension=MCJaNkHvR4k&dimension=N4labxVCcQf&dimension=KzJDg9X6uDN&dimension=bfOO70OOlaY&dimension=xIDRqKyNmAr&dimension=d6Ow3V4xjIZ&dimension=hAeErvVxaoN&dimension=I8WoVfOyQQ1&dimension=BDSjDBfv0wn&dimension=wB9dymXFtuZ&displayProperty=NAME&startDate='+periodStr+'&endDate='+periodendDate,
+            success: function(data){
+                for(var i=0;i<data.rows.length;i++)
+                {
+
+                    ecptarget=ecptarget+Math.round(data.rows[i][9]);
+                    novotarget=novotarget+Math.round(data.rows[i][10]);
+                    depovorveratarget= depovorveratarget+Math.round(data.rows[i][11]);
+                    femijecttarget=femijecttarget+Math.round(data.rows[i][12]);
+                    multiloadtarget= multiloadtarget+Math.round(data.rows[i][13]);
+                    novajecttarget= novajecttarget+Math.round(data.rows[i][14]);
+                    safeloadtarget=safeloadtarget+Math.round(data.rows[i][15]);
+                    touchcondomstarget=touchcondomstarget+Math.round(data.rows[i][16]);
+                    sathiconsomstarget=sathiconsomstarget+Math.round(data.rows[i][17]);
+                }
+
+            },
+            error: function(response){
+
+            }
+        });
+
+        $.ajax({
+            async : false,
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            header : header,
+            url: '../api/analytics/events/query/DLC3sZA9asA.json?stage=DZFh7HUSfum&dimension=ou:OU_GROUP-'+regionorg+'&dimension=ca8KFIqeM4o:IN%3AE%20C%20P%3BNOVODOL%20CYCLES%3BDEPO%20PROVERA%3BTOUCH%20DOTTED%206S%20DISP%3BFEMIJECT%3BNOVAJECT%3BIUD%20MULTI%20LOAD%3BIUD%20SAFE%20LOAD&dimension=GlORnHsQGA8&outputType=EVENT&displayProperty=NAME&startDate='+periodStr+'&endDate='+periodendDate,
+
+            success: function(data){
+
+                $.each(data.rows,function(index,item) {
+
+                    while(item[8]=="E C P")
+                    {
+
+                        region=regionorgname;
+                        target=ecptarget;
+                        rowcount=1;
+                        team="PHARMA";
+                        mediname=item[8];
+                        outlets= (ecpoutlets++);
+                        if(item[10=="R"])
+                        {
+                            ecpachievementsR=ecpachievementsR+Number(item[9]);
+                        }
+                        else if(item[10]=="S")
+                        {
+                            ecpachievements=Math.round(ecpachievements+Math.round(Number(item[9])));
+                        }
+
+
+                        achievement=ecpachievements-ecpachievementsR;
+                        targettodate= Math.round((target/31)*periodStrday);
+                        productfound="ecp";
+                        break;
+                    }
+
+                });
+
+                if(productfound=="ecp") {
+
+                    tableDataHtml = tableDataHtml + "<td><center>" + region + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + team + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + mediname + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + ecpoutlets+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + target + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + targettodate+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + achievement+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                    tableDataHtml = "<tr>" + tableDataHtml + "</tr>";
+                    region="";
+                    achievement="";
+                    outlets="";
+                    ecpoutlets="";
+                    ecptarget=0;
+
+                    team="";
+                    target="";
+                    mediname="";
+                    targettodate="";
+                    ecpachievements=0;
+                }
+
+
+
+
+                $.each(data.rows,function(index,item) {
+                   while (item[8]== "NOVODOL CYCLES") {
+
+                       region=regionorgname;
+                       mediname=item[8];
+                        target=novotarget;
+                        team="PHARMA";
+                        outlets= (novooutlets++);
+                       if(item[10=="R"])
+                       {
+                           novoachievementR=novoachievementR+Number(item[9]);
+                       }
+                       else if(item[10]=="S")
+                       {
+                           novoachievement=novoachievement+Math.round(Number(item[9]));
+                       }
+
+
+                        achievement=novoachievement-novoachievementR;
+                       targettodate=Math.round((target/31)*periodStrday);
+                       productfound="novodol";
+                       break;
+                    }
+
+					});
+                if(productfound=="novodol") {
+                    tableDataHtml = tableDataHtml + "<td><center>" + region + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + team + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + mediname + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + novooutlets+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + target + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + targettodate+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + achievement+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                    tableDataHtml = "<tr>" + tableDataHtml + "</tr>";
+                    region="";
+                    achievement="";
+                    outlets="";
+                    novotarget=0;
+                    novooutlets="";
+                    novoachievement=0;
+                    team="";
+                    target="";
+                    mediname="";
+                    targettodate="";
+                }
+
+
+					$.each(data.rows,function(index,item) {
+                    while (item[8] == "DEPO PROVERA") {
+                        region=regionorgname;
+                        mediname=item[8];
+                        team="PHARMA";
+						target=depovorveratarget;
+                        outlets= (depooutlets++);
+                        if(item[10=="R"])
+                        {
+                            depoachievementR=depoachievementR+Number(item[9]);
+                        }
+                        else if(item[10]=="S")
+                        {
+                            depoachievement=depoachievement+Math.round(Number(item[9]));
+                        }
+
+
+                        achievement=depoachievement-depoachievementR;
+                        targettodate=Math.round((target/31)*periodStrday);
+                        productfound="depo";
+                        break;
+
+                    }
+
+					});
+                if(productfound=="depo") {
+                    tableDataHtml = tableDataHtml + "<td><center>" +region + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + team + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + mediname + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + depooutlets+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + target + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + targettodate+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + achievement+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                    tableDataHtml = "<tr>" + tableDataHtml + "</tr>";
+                    region="";
+                    achievement="";
+                    depovorveratarget=0;
+                    outlets="";
+                    team="";
+                    target="";
+                    depoachievement=0;
+                    depooutlets="";
+                    mediname="";
+                    targettodate="";
+
+                }
+
+
+					$.each(data.rows,function(index,item) {
+                     while (item[8] == "NOVAJECT") {
+                         region = regionorgname;
+                         team = "FMCG";
+                         mediname = item[8];
+                         target = novajecttarget;
+                         outlets = (novajectoutlets++);
+                         if(item[10=="R"])
+                         {
+                             novajectacheivementR=novajectacheivementR+Number(item[9]);
+                         }
+                         else if(item[10]=="S")
+                         {
+                             novajectacheivement = novajectacheivement + Math.round(Number(item[9]));
+                         }
+
+                         achievement = touchachievement-novajectacheivementR;
+                         targettodate = (target / 31) * 19;
+                         productfound = "nova";
+                         break;
+
+                     }
+                    });
+                        if(productfound=="nova") {
+                            tableDataHtml = tableDataHtml + "<td><center>" + region+ "</center></td>";
+                            tableDataHtml = tableDataHtml + "<td><center>" + team + "</center></td>";
+                            tableDataHtml = tableDataHtml + "<td><center>" + mediname + "</center></td>";
+                            tableDataHtml = tableDataHtml + "<td><center>" + novajectoutlets+ "</center></td>";
+                            tableDataHtml = tableDataHtml + "<td><center>" + target + "</center></td>";
+                            tableDataHtml = tableDataHtml + "<td><center>" + targettodate+ "</center></td>";
+                            tableDataHtml = tableDataHtml + "<td><center>" + achievement+ "</center></td>";
+                            tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                            tableDataHtml = "<tr>" + tableDataHtml + "</tr>";
+                            region="";
+                            achievement="";
+                            outlets=0;
+                            team="";
+                            target="";
+                            mediname="";
+                            targettodate="";
+                            novajectoutlets=0;
+                            novajectacheivement=0;
+
+                        }
+
+
+
+					$.each(data.rows,function(index,item) {
+                     while (item[8] == "IUD MULTI LOAD") {
+                         region = regionorgname;
+                         team = "FMCG";
+                         mediname = item[8];
+                         target = multiloadtarget;
+                         outlets = (multilaodoutlets++);
+                         if(item[10=="R"])
+                         {
+                             multiloadacheivementR=multiloadacheivementR+Number(item[9]);
+                         }
+                         else if(item[10]=="S")
+                         {
+                             multiloadacheivement = multiloadacheivement + Math.round(Number(item[9]));
+                         }
+
+                         achievement = multiloadacheivement-multiloadacheivementR;
+                         targettodate = (target / 31) * 19;
+                         productfound = "iudmulti";
+                         break;
+                     }
+                    });
+
+                if(productfound=="iudmulti") {
+                    tableDataHtml = tableDataHtml + "<td><center>" + region+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + team + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + mediname + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + multilaodoutlets+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + target + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + targettodate+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + achievement+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                    tableDataHtml = "<tr>" + tableDataHtml + "</tr>";
+                    region="";
+                    achievement="";
+                    outlets=0;
+                    team="";
+                    target="";
+                    mediname="";
+                    targettodate="";
+                    multilaodoutlets=0;
+                    multiloadacheivement=0;
+
+                }
+
+            $.each(data.rows,function(index,item) {
+                     while (item[8] == "FEMIJECT") {
+                         region = regionorgname;
+                         team = "FMCG";
+                         mediname = item[8];
+                         target = femijecttarget;
+                         outlets = (femijectoutlets++);
+                         if(item[10=="R"])
+                         {
+                             femijectacheivementR=femijectacheivementR+Number(item[9]);
+                         }
+                         else if(item[10]=="S")
+                         {
+                             femijectacheivement = femijectacheivement + Math.round(Number(item[9]));
+                         }
+
+                         achievement = femijectacheivement-femijectacheivementR;
+                         targettodate = (target / 31) * 19;
+
+                         productfound = "femiject";
+                         break;
+                     }
+            });
+                if(productfound=="femiject") {
+                    tableDataHtml = tableDataHtml + "<td><center>" + region+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + team + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + mediname + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + femijectoutlets+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + target + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + targettodate+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + achievement+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                    tableDataHtml = "<tr>" + tableDataHtml + "</tr>";
+                    region="";
+                    achievement="";
+                    outlets=0;
+                    team="";
+                    target="";
+                    mediname="";
+                    targettodate="";
+                    femijectoutlets=0;
+                    femijectacheivement=0;
+                }
+
+
+            $.each(data.rows,function(index,item) {
+                     while (item[8] == "IUD SAFE LOAD") {
+                         region = regionorgname;
+                         team = "FMCG";
+                         mediname = item[8];
+                         target = safeloadtarget;
+                         outlets = (safeloadoutlets++);
+                         if(item[10=="R"])
+                         {
+                             safeloadacheivementR=safeloadacheivementR+Number(item[9]);
+                         }
+                         else if(item[10]=="S")
+                         {
+                             safeloadacheivement = safeloadacheivement + Math.round(Number(item[9]));
+                         }
+
+
+                         achievement = safeloadacheivement-safeloadacheivementR;
+                         targettodate = (target / 31) * 19;
+                         productfound = "iudsafe";
+                         break;
+                     }
+            });
+                if(productfound=="iudsafe") {
+                    tableDataHtml = tableDataHtml + "<td><center>" + region+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + team + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + mediname + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + safeloadoutlets+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + target + "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + targettodate+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + achievement+ "</center></td>";
+                    tableDataHtml = tableDataHtml + "<td><center>" + "" + "</center></td>";
+                    tableDataHtml = "<tr>" + tableDataHtml + "</tr>";
+                    region="";
+                    achievement="";
+                    outlets=0;
+                    team="";
+                    target="";
+                    mediname="";
+                    targettodate="";
+                    safeloadoutlets=0;
+                    safeloadacheivement=0;
+                }
+
+                   $('#datavalue1').append(tableDataHtml);
+            },
+            error: function(response){
+
+            }
+        });
+
+    }
+    function loadReport() {
+        var htmlReport = "";
+        var selYear = gotPeriod.substring(0, 4);
+        var selMonth = gotPeriod.substring(4, 6);
+
+        //console.log( jsonData1 );
+        $("#" + showingTable + " > thead").html("");
+
+        htmlReport += "<thead><tr bgcolor='#F2DDDC' align='center' height='44'>";
+        // htmlReport += "<td>OrgUnit</td>";
+        $.each(tableDX, function () {
+            htmlReport += "<td>" + this.dxName + "</td>;";
+        });
+        htmlReport += "</tr></thead>";
+
+        $("#" + showingTable + " > tbody").html("");
+        htmlReport += "<tbody>";
+        $.each(orgUnitChildren, function (index1, ou) {
+            htmlReport += "<tr>";
+            htmlReport += "<td align='left'style='padding-left:5px'>" + ou.name + "</td>";
+            $.each(tableDX, function (index2, de) {
+                var temp = getCellValue(jsonData1, de.dxId, ou.id, periodsStr);
+                htmlReport += "<td align='center'>" + temp + "</td>";
+            });
+            htmlReport += "</tr>";
+        });
+        htmlReport += "</tbody>";
+
+        $("#" + showingTable).append(htmlReport);
+        hideLoad();
+    }
+
+    function getCellValue(json, de, ou, periodsStr) {
+        var result = 0;
+        for (var i = 0; i < json.rows.length; i++) {
+            //console.log( json.rows[i][0] + " : " + json.rows[i][1] + " : " + json.rows[i][2] + " : " + json.rows[i][3] );
+            //console.log( de + " : " + ou + " : " + coc );
+            //console.log( "********************************************" );
+            if (json.rows[i][0] == de && json.rows[i][2] == periodsStr && json.rows[i][1] == ou && json.rows[i][3] != null) {
+                result = json.rows[i][3];
+            }
+        }
+        return parseInt(result);
+    }
+
+</script>
+
+<script type="text/javascript" >
+    function printContent(el) {
+        var restorepage = document.body.innerHTML;
+        var printcontent = document.getElementById(el).innerHTML;
+        document.body.innerHTML = printcontent;
+        window.print();
+        document.body.innerHTML = restorepage;
+    }
+</script>
+<p><span style="font-size:12px;">
+<style>
+    th {
+        text-align: center;
+    }
+
+    td {
+        padding: 3px 7px;
+
+    }
+
+    .bd {
+        border-style: solid;
+        border-color: #000000;
+    }
+
+    #cover {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 5;
+        width: 100%;
+        height: 100%;
+    }
+
+    #loads {
+        height: 100px;
+        width: 500px;
+        position: fixed;
+        z-index: 10;
+        margin: 0 auto;
+        top: 50%;
+        left: 50%;
+        margin-top: -50px;
+        margin-left: -250px;
+        background: #999;
+        border: 5px solid #cccccc;
+        text-align : center;
+        border-radius: 5px;
+    }
+
+    .loading {
+        width: 400px;
+        font-size: 20px;
+        font-family: verdana;
+        font-weight: bolder;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        margin: 0 auto;
+        margin-top: -8px;
+        margin-left: -200px;
+    }
+
+
+
+
+</style>
+
+</span></p>
+<table>
+    <tr>
+        <td>
+            <input type="button" id="btnBack" value=" Go to Dashboard"
+                   onclick="location.href='../dhis-web-dashboard-integration/index.action'"/>
+            <input type="button" onclick="printContent('printing');" value="Print"/>
+            <!--<input type="button" id="btnExport" value=" Download Excel " />-->
+
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>Select Date:</td>
+
+
+    </tr>
+    <tr>
+        <td><input type="text" placeholder="Start Date" id="datepicker"></td>
+        <td><input type="text" placeholder="End Date"id="datepicker1"></td>
+        <td>Select Region:</td>
+        <td><select id="dropregion" >
+            <option value="" disabled selected hidden>Please Select</option>
+        </select></td>
+    </tr>
+        <td><input type="button" onClick="loadDataX()" value="go" style="width:30px"/></td>
+
+</table>
+</br></br>
+</br></br>
+
+<div id="printing">
+    <table>
+        <tr>
+            <td>
+                <table border="1" cellspacing="6" cellpadding="4" width="100%"
+                       style="border-collapse:collapse; border:2px; font-weight:bolder">
+                    <thead>
+                    <tr align="center" height="27">
+                        <td colspan="30" width="2082" height="27" class="col" bgcolor="#32849C"><font color="white"><b>Sales Data Report
+                        </b></font></td>
+                    </tr>
+                    <tr bgcolor="#F2DDDC" align="center" height="20">
+                        <td colspan="1" height="20" align="right"><b>Parent OU:</b></td>
+                        <td colspan="2" id="selectedOUName">&nbsp;</td>
+                        <td colspan="5">&nbsp;</td>
+                        <td colspan="1" align="right"><b>Month: </b></td>
+                        <td colspan="2" id="period">&nbsp;</td>
+                    </tr>
+                    </thead>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table id="datavalue1" border="1" cellspacing="6" cellpadding="4" width="100%"
+                       style="border-collapse:collapse; border:2px; font-weight:bolder;
+    border-spacing: 0;">
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
