@@ -138,6 +138,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
             resetParams();
             //$scope.doSearch = true;
             $scope.loadPrograms($scope.selectedOrgUnit);
+			$scope.setSelectedSearchingOrgUnit($scope.selectedOrgUnit);
         }
     });
     
@@ -370,6 +371,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
             });         
             
         }
+		$scope.queryUrl = null;
     };
     
     $scope.jumpToPage = function(){
@@ -516,7 +518,7 @@ var trackerCaptureControllers = angular.module('trackerCaptureControllers', [])
     };
     
     //load programs for the selected orgunit (from tree)
-    $scope.setSelectedSearchingOrgUnit = function(orgUnit){    
-        $scope.selectedSearchingOrgUnit = orgUnit;
+    $scope.setSelectedSearchingOrgUnit = function(selectedOrgUnit){    
+        $scope.selectedSearchingOrgUnit = selectedOrgUnit;
     };
 });
